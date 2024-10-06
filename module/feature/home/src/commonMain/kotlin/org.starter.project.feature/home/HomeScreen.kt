@@ -1,12 +1,15 @@
 package org.starter.project.feature.home
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import io.github.aakira.napier.Napier
 import org.koin.compose.viewmodel.koinViewModel
+import org.starter.project.ui.design.system.scaffold.DesignSystemScaffold
 
 @Composable
 fun HomeScreen(
@@ -32,5 +35,10 @@ private fun HomeScreenContent(
     state: HomeScreenState,
     handler: HomeScreenEventHandler
 ) {
+    DesignSystemScaffold(
+        modifier = Modifier.fillMaxSize(),
+        screenState = state.screenState,
+    ) { paddingValues ->
 
+    }
 }

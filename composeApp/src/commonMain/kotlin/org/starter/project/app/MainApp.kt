@@ -12,17 +12,20 @@ import androidx.compose.ui.graphics.Color
 import org.koin.compose.KoinApplication
 import org.starter.project.di.koin
 import org.starter.project.feature.home.HomeScreen
+import org.starter.project.ui.design.system.theme.DesignSystemTheme
 
 @Composable
 fun MainApp() {
     KoinApplication(koin()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .windowInsetsPadding(WindowInsets.safeDrawing)
-        ) {
-            HomeScreen()
+        DesignSystemTheme {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+                    .windowInsetsPadding(WindowInsets.safeDrawing)
+            ) {
+                HomeScreen()
+            }
         }
     }
 }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <string name="loading_failure_default_message">読み込みに失敗しました</string>
+    <string name="loading_failure_default_action_label">再度読み込む</string>
+</resources>

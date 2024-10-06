@@ -31,12 +31,11 @@ import org.starter.project.ui.resources.loading_failure_default_message
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
-
 @Composable
 fun DesignSystemScaffold(
     modifier: Modifier = Modifier,
     screenState: ScreenState,
-    backgroundColor: Color = Color.White,
+    backgroundColor: Color = DesignSystemTheme.colors.background,
     onTapErrorActionButton: (() -> Unit)? = null,
     topBar: @Composable (() -> Unit)? = null,
     bottomBar: @Composable (() -> Unit)? = null,
@@ -104,20 +103,20 @@ fun ErrorContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(DesignSystemTheme.colors.background)
             .padding(horizontal = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = title,
             style = DesignSystemTheme.typography.subtitle1,
             color = Color.Black,
+            text = title
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = message,
             style = DesignSystemTheme.typography.body1,
-            color = Color.DarkGray
+            color = Color.DarkGray,
+            text = message
         )
         Spacer(modifier = Modifier.height(32.dp))
         onTapActionButton?.let {

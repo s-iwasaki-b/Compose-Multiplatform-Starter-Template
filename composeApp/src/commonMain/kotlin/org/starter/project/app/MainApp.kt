@@ -21,7 +21,7 @@ fun MainApp() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White)
+                    .background(DesignSystemTheme.colors.background)
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
                 HomeScreen()

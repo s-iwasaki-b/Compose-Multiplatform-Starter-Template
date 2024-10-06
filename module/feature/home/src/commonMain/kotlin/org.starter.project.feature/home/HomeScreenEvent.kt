@@ -7,7 +7,7 @@ internal sealed interface HomeScreenEvent : ScreenEvent {
 }
 
 internal object HomeScreenEventHandler {
-    operator fun invoke(
+    inline operator fun invoke(
         event: ScreenEvent,
         viewModel: HomeScreenViewModel
     ) {

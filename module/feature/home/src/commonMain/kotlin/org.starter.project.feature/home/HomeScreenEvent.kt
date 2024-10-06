@@ -1,17 +1,18 @@
 package org.starter.project.feature.home
 
 import org.starter.project.ui.shared.event.ScreenEvent
-import org.starter.project.ui.shared.event.ScreenEventHandler
 
 internal sealed interface HomeScreenEvent : ScreenEvent {
-
+    data object OnTapErrorScreenAction : HomeScreenEvent
 }
 
-internal class HomeScreenEventHandler(
-    viewModel: HomeScreenViewModel
-) : ScreenEventHandler {
-    override operator fun invoke(event: ScreenEvent) {
+internal object HomeScreenEventHandler {
+    operator fun invoke(
+        event: ScreenEvent,
+        viewModel: HomeScreenViewModel
+    ) {
         when (event) {
+            HomeScreenEvent.OnTapErrorScreenAction -> viewModel.refresh()
             else -> {
                 /* no-op */
             }

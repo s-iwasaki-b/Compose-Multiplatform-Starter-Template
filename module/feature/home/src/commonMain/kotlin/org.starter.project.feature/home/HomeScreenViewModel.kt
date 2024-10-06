@@ -26,4 +26,8 @@ class HomeScreenViewModel : ViewModel() {
         SharingStarted.Eagerly,
         _state.value
     )
+
+    fun refresh() {
+        // TODO: implement refresh logic
+    }
 }

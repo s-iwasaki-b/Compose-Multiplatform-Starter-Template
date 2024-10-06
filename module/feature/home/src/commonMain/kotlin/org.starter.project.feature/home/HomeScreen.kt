@@ -10,6 +10,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import io.github.aakira.napier.Napier
 import org.koin.compose.viewmodel.koinViewModel
 import org.starter.project.ui.design.system.scaffold.DesignSystemScaffold
+import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
 fun HomeScreen(
@@ -26,18 +27,26 @@ fun HomeScreen(
 
     HomeScreenContent(
         state = state,
-        handler = HomeScreenEventHandler(viewModel)
+        handler = { event ->
+            HomeScreenEventHandler(
+                event = event,
+                viewModel = viewModel
+            )
+        }
     )
 }
 
 @Composable
 private fun HomeScreenContent(
     state: HomeScreenState,
-    handler: HomeScreenEventHandler
+    handler: (event: ScreenEvent) -> Unit
 ) {
     DesignSystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
+        onTapErrorActionButton = {
+            handler(HomeScreenEvent.OnTapErrorScreenAction)
+        }
     ) { paddingValues ->
 
     }

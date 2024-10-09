@@ -10,5 +10,10 @@ open class ZennServiceImpl(
     private val resultHandler: ResultHandler,
     private val zennRepository: ZennRepository
 ) : ZennService {
-
+    override suspend fun fetchArticles(
+        keyword: String,
+        nextPage: String?
+    ) = resultHandler.async {
+        zennRepository.fetchArticles(keyword, nextPage)
+    }
 }

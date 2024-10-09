@@ -15,6 +15,7 @@ koin = "4.0.0"
 ktor = "2.3.12"
 ktorfit = "2.1.0"
 napier = "2.7.1"
+paging-compose-common = "3.3.0-alpha02-0.5.1"
 mokkery = "2.3.0"
 
 [libraries]
@@ -35,6 +36,7 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktorfit = { module = "de.jensklingenberg.ktorfit:ktorfit-lib", version.ref = "ktorfit" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
+paging-compose-common = { module = "app.cash.paging:paging-compose-common", version.ref = "paging-compose-common" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -80,5 +82,5 @@ domain = [
 
 ]
 ui = [
-
+    "paging-compose-common",
 ]

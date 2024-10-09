@@ -18,6 +18,7 @@ class ResultHandler(
                 val value = block()
                 Result.success(value)
             } catch (e: Throwable) {
+                // TODO: report error to your analytics
                 Napier.d { e.message.orEmpty() }
                 Result.failure(e)
             }
@@ -36,6 +37,7 @@ class ResultHandler(
             val value = block()
             Result.success(value)
         } catch (e: Throwable) {
+            // TODO: report error to your analytics
             Napier.d { e.message.orEmpty() }
             Result.failure(e)
         }

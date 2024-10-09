@@ -13,8 +13,9 @@ class ZennRepositoryImpl(
     override suspend fun fetchArticles(
         userName: String?,
         publicationName: String?,
-        order: String?
+        order: String?,
+        page: String?
     ): Articles {
-        return ArticlesConverter(zennApi.fetchArticles(userName, publicationName, order))
+        return ArticlesConverter(zennApi.fetchArticles(userName, publicationName, order, page))
     }
 }

@@ -9,6 +9,7 @@ interface ZennApi {
     suspend fun fetchArticles(
         @Query("username") userName: String? = null,
         @Query("publication_name") publicationName: String? = null,
-        @Query("order") order: String? = null
+        @Query("order") order: String? = null,
+        @Query("page") page: String? = null
     ): ArticlesResponse
 }

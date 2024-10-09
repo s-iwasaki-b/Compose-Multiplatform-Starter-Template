@@ -37,7 +37,7 @@ data class ArticleResponse(
     val publishedAt: String?,
     @SerialName("body_updated_at")
     val bodyUpdatedAt: String?,
-    @SerialName("sourceRepoUpdatedAt")
+    @SerialName("source_repo_updated_at")
     val sourceRepoUpdatedAt: String?,
     @SerialName("pinned")
     val pinned: Boolean?,
@@ -46,7 +46,7 @@ data class ArticleResponse(
     @SerialName("user")
     val user: UserResponse?,
     @SerialName("publication")
-    val publication: String?
+    val publication: PublicationResponse?
 )
 
 @Serializable
@@ -59,4 +59,22 @@ data class UserResponse(
     val name: String?,
     @SerialName("avatar_small_url")
     val avatarSmallUrl: String?
+)
+
+@Serializable
+data class PublicationResponse(
+    @SerialName("id")
+    val id: Int?,
+    @SerialName("name")
+    val name: String?,
+    @SerialName("display_name")
+    val displayName: String?,
+    @SerialName("avatar_small_url")
+    val avatarSmallUrl: String?,
+    @SerialName("avatar_url")
+    val avatarUrl: String?,
+    @SerialName("pro")
+    val pro: Boolean?,
+    @SerialName("avatar_registered")
+    val avatarRegistered: Boolean?
 )

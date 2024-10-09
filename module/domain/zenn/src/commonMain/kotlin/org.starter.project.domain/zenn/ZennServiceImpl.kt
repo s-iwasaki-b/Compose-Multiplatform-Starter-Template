@@ -14,6 +14,18 @@ open class ZennServiceImpl(
         keyword: String,
         nextPage: String?
     ) = resultHandler.async {
-        zennRepository.fetchArticles(keyword, nextPage)
+        val keywordAsPublicationNameResult = zennRepository.fetchArticles(
+            publicationName = keyword,
+            page = nextPage
+        )
+
+        return@async if (keywordAsPublicationNameResult.articles.isEmpty()) {
+            zennRepository.fetchArticles(
+                userName = keyword,
+                page = nextPage
+            )
+        } else {
+            keywordAsPublicationNameResult
+        }
     }
 }

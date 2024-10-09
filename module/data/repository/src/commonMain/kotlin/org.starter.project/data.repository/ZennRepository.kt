@@ -6,6 +6,7 @@ interface ZennRepository : Repository {
     suspend fun fetchArticles(
         userName: String? = null,
         publicationName: String? = null,
-        order: String? = "latest"
+        order: String? = "latest",
+        page: String? = null
     ): Articles
 }

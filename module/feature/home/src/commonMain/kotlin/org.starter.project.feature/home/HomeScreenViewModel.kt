@@ -2,15 +2,24 @@ package org.starter.project.feature.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.starter.project.domain.service.ZennService
+import org.starter.project.feature.home.component.paging.ArticlesPagingSource
+import org.starter.project.ui.extension.handle
+import org.starter.project.ui.shared.handler.SnackBarThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
-class HomeScreenViewModel : ViewModel() {
+class HomeScreenViewModel(
+    private val zennService: ZennService
+) : ViewModel() {
     private val _screenState = MutableStateFlow(
         ScreenState(ScreenLoadingState.Initial(true), null)
     )
@@ -28,9 +37,23 @@ class HomeScreenViewModel : ViewModel() {
         _state.value
     )
 
-    fun refresh() {
-        // TODO: implement refresh logic
-    }
+    val articlesPagingFlow = Pager(
+        PagingConfig(ArticlesPagingSource.PAGE_SIZE)
+    ) {
+        ArticlesPagingSource(
+            onLoadedFirstPage = {
+                _screenState.update {
+                    it.copy(screenLoadingState = ScreenLoadingState.Success())
+                }
+            },
+            fetcher = { key ->
+                zennService.fetchArticles(
+                    keyword = _state.value.searchKeyword,
+                    nextPage = key
+                ).handle(SnackBarThrowableHandler(_screenState))
+            }
+        )
+    }.flow.cachedIn(viewModelScope)
 
     fun updateSearchKeyword(keyword: String) {
         _state.update {

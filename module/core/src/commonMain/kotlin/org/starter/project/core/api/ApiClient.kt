@@ -3,29 +3,21 @@ package org.starter.project.core.api
 import de.jensklingenberg.ktorfit.Ktorfit
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.plugins.ClientRequestException
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.kotlinx.json.json
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.logging.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.starter.project.base.error.ApiError
 import org.starter.project.base.error.ApiErrorResponse
-import org.starter.project.core.api.ApiConfig.authHeader
-import org.starter.project.core.api.ApiConfig.commonHeader
 
 object ApiClient {
     private val client = HttpClient {
         defaultRequest {
             url(ApiConfig.API_BASE_URL)
-            authHeader()
-            commonHeader()
         }
         install(ContentNegotiation) {
             json(Json {

@@ -3,4 +3,8 @@
     <!-- Common -->
     <string name="loading_failure_default_message">読み込みに失敗しました</string>
     <string name="loading_failure_default_action_label">再度読み込む</string>
+
+    <!-- Design System -->
+    <string name="search_bar_default_placeholder">検索</string>
+    <string name="search_bar_cancel">キャンセル</string>
 </resources>

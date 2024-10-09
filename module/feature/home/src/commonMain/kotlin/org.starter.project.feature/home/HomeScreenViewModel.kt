@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
@@ -29,5 +30,13 @@ class HomeScreenViewModel : ViewModel() {
 
     fun refresh() {
         // TODO: implement refresh logic
+    }
+
+    fun updateSearchKeyword(keyword: String) {
+        _state.update {
+            it.copy(
+                searchKeyword = keyword
+            )
+        }
     }
 }

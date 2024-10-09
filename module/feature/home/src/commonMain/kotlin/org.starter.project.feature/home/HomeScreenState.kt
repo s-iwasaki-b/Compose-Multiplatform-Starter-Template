@@ -5,5 +5,6 @@ import org.starter.project.ui.shared.state.ScreenState
 
 @Immutable
 internal data class HomeScreenState(
-    val screenState: ScreenState
+    val screenState: ScreenState,
+    val searchKeyword: String = ""
 )

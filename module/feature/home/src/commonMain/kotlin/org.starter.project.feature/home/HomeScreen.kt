@@ -1,15 +1,22 @@
 package org.starter.project.feature.home
 
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import io.github.aakira.napier.Napier
 import org.koin.compose.viewmodel.koinViewModel
 import org.starter.project.ui.design.system.scaffold.DesignSystemScaffold
+import org.starter.project.ui.design.system.search.SearchBar
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
@@ -17,6 +24,7 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val focusManager = LocalFocusManager.current
 
     // This is an example of lifecycle event listener
     // cf. https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-lifecycle.html#mapping-android-lifecycle-to-other-platforms
@@ -27,10 +35,11 @@ fun HomeScreen(
 
     HomeScreenContent(
         state = state,
-        handler = { event ->
+        dispatch = { event ->
             HomeScreenEventHandler(
                 event = event,
-                viewModel = viewModel
+                viewModel = viewModel,
+                focusManager = focusManager
             )
         }
     )
@@ -39,15 +48,36 @@ fun HomeScreen(
 @Composable
 private fun HomeScreenContent(
     state: HomeScreenState,
-    handler: (event: ScreenEvent) -> Unit
+    dispatch: (event: ScreenEvent) -> Unit
 ) {
     DesignSystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
         onTapErrorActionButton = {
-            handler(HomeScreenEvent.OnTapErrorScreenAction)
+            dispatch(HomeScreenEvent.OnTapErrorScreenAction)
         }
     ) { paddingValues ->
-
+        LazyColumn(
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+        ) {
+            item(key = "search_bar") {
+                Spacer(modifier = Modifier.height(16.dp))
+                SearchBar(
+                    value = state.searchKeyword,
+                    onValueChange = {
+                        dispatch(HomeScreenEvent.OnChangeSearchKeyword(it))
+                    },
+                    onTapClear = {
+                        dispatch(HomeScreenEvent.OnTapClearSearchKeyword)
+                    },
+                    onTapCancel = {
+                        dispatch(HomeScreenEvent.OnTapCancelSearchKeyword)
+                    }
+                )
+            }
+        }
     }
 }

@@ -1,5 +1,11 @@
 package org.starter.project.data.repository
 
-interface ZennRepository : Repository {
+import org.starter.project.base.data.model.zenn.Articles
 
+interface ZennRepository : Repository {
+    suspend fun fetchArticles(
+        userName: String? = null,
+        publicationName: String? = null,
+        order: String? = "latest"
+    ): Articles
 }

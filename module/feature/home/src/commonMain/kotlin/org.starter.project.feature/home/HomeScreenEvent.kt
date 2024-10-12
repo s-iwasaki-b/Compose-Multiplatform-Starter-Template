@@ -21,20 +21,16 @@ internal object HomeScreenEventHandler {
             HomeScreenEvent.OnTapErrorScreenAction -> {
                 articlesPagingItems.refresh()
             }
-
             is HomeScreenEvent.OnChangeSearchKeyword -> {
                 viewModel.updateSearchKeyword(event.keyword)
             }
-
             HomeScreenEvent.OnTapClearSearchKeyword -> {
                 viewModel.updateSearchKeyword("")
                 articlesPagingItems.refresh()
             }
-
             HomeScreenEvent.OnTapActionSearchKeyword -> {
                 articlesPagingItems.refresh()
             }
-
             else -> {
                 /* no-op */
             }

@@ -6,9 +6,12 @@ import org.starter.project.data.repository.ZennRepository
 import org.starter.project.data.zenn.converter.ArticlesConverter
 import org.starter.project.data.zenn.datasource.api.ZennApi
 import org.starter.project.data.zenn.datasource.api.createZennApi
+import org.starter.project.data.zenn.datasource.preferences.ZennPreferences
+import org.starter.project.data.zenn.datasource.preferences.ZennPreferencesImpl
 
 class ZennRepositoryImpl(
-    private val zennApi: ZennApi = ApiClient.ktorfit.createZennApi()
+    private val zennApi: ZennApi = ApiClient.ktorfit.createZennApi(),
+    private val zennPreferences: ZennPreferences = ZennPreferencesImpl()
 ) : ZennRepository {
     override suspend fun fetchArticles(
         userName: String?,
@@ -17,5 +20,11 @@ class ZennRepositoryImpl(
         page: String?
     ): Articles {
         return ArticlesConverter(zennApi.fetchArticles(userName, publicationName, order, page))
+    }
+
+    override fun getLastKeyword(): String? = zennPreferences.lastKeyword
+
+    override fun updateLastKeyword(keyword: String) {
+        zennPreferences.lastKeyword = keyword
     }
 }

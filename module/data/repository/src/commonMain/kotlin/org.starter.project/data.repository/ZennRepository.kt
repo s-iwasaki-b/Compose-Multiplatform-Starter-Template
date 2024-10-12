@@ -9,4 +9,6 @@ interface ZennRepository : Repository {
         order: String? = "latest",
         page: String? = null
     ): Articles
+    fun getLastKeyword(): String?
+    fun updateLastKeyword(keyword: String)
 }

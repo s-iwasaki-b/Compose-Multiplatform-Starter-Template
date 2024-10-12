@@ -63,7 +63,7 @@ class HomeScreenViewModel(
         )
     }.flow.cachedIn(viewModelScope)
 
-    fun initKeyword() {
+    fun initSearchKeyword() {
         val lastKeyword = zennService.getLastKeyword().handle(IgnoreThrowableHandler()).orEmpty()
         _state.update {
             it.copy(

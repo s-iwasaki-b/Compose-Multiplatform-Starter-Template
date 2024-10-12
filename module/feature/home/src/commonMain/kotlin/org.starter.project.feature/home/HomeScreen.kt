@@ -37,7 +37,7 @@ fun HomeScreen(
     // cf. https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-lifecycle.html#mapping-android-lifecycle-to-other-platforms
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         Napier.d { "HomeScreen.onStart" }
-        viewModel.initKeyword()
+        viewModel.initSearchKeyword()
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { Napier.d { "HomeScreen.onResume" } }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { Napier.d { "HomeScreen.onPause" } }

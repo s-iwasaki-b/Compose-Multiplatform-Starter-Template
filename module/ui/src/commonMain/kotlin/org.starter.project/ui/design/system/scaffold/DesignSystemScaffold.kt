@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.stringResource
+import org.starter.project.ui.design.system.loading.LoadingIndicator
 import org.starter.project.ui.design.system.theme.DesignSystemTheme
 import org.starter.project.ui.resources.Res
 import org.starter.project.ui.resources.loading_failure_default_action_label
@@ -94,16 +95,7 @@ fun DesignSystemScaffold(
         enter = fadeIn(),
         exit = fadeOut()
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(42.dp),
-                color = DesignSystemTheme.colors.onSurface.copy(alpha = 0.3f),
-                strokeCap = StrokeCap.Round
-            )
-        }
+        LoadingIndicator()
     }
 }
 

@@ -42,6 +42,11 @@ class HomeScreenViewModel(
         PagingConfig(ArticlesPagingSource.PAGE_SIZE)
     ) {
         ArticlesPagingSource(
+            onRefresh = {
+                _screenState.update {
+                    it.copy(screenLoadingState = ScreenLoadingState.Loading())
+                }
+            },
             onLoadedFirstPage = {
                 _screenState.update {
                     it.copy(screenLoadingState = ScreenLoadingState.Success())

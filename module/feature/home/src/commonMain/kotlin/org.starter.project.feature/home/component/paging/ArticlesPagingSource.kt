@@ -7,6 +7,7 @@ import org.starter.project.base.data.model.zenn.Articles
 
 
 class ArticlesPagingSource(
+    private val onRefresh: () -> Unit = {},
     private val onLoadedFirstPage: () -> Unit = {},
     private val fetcher: suspend (key: String?) -> Articles?,
 ) : PagingSource<String, Article>() {
@@ -21,6 +22,7 @@ class ArticlesPagingSource(
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, Article> {
         return try {
+            params.key ?: onRefresh()
             val currentKey = params.key
             val data = fetcher(currentKey)
             val nextKey = data?.nextPage

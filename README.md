@@ -9,6 +9,12 @@ This already includes a basic module structure and dependencies, following the [
 Currently, the targets are Android and iOS.
 
 
+# How to Use
+[Create your repository from this template repository](https://github.com/new?template_name=Compose-Multiplatform-Starter-Template&template_owner=s-iwasaki-b)
+
+### Rename Package
+TODO
+
 # Architecture
 ![Compose Multiplatform Starter Repository Architecture](https://github.com/user-attachments/assets/90445e4b-ceda-47d3-a21b-b2461c7e3eab)
 

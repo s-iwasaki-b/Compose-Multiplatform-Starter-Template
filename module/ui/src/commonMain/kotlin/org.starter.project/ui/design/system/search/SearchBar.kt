@@ -123,7 +123,11 @@ fun SearchBar(
             Text(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .clickable { onTapAction() }
+                    .clickable {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                        onTapAction()
+                    }
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 style = DesignSystemTheme.typography.body2,
                 color = Color.Black,

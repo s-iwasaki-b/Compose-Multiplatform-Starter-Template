@@ -6,13 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -33,7 +31,6 @@ fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val focusManager = LocalFocusManager.current
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
 
     // This is an example of lifecycle event listener
@@ -53,7 +50,6 @@ fun HomeScreen(
             HomeScreenEventHandler(
                 event = event,
                 viewModel = viewModel,
-                focusManager = focusManager,
                 articlesPagingItems = articlesPagingItems
             )
         }
@@ -68,7 +64,7 @@ private fun HomeScreenContent(
     dispatch: (event: ScreenEvent) -> Unit
 ) {
     val listState = rememberLazyListState()
-    
+
     LaunchedEffect(articlesPagingItems.loadState.refresh) {
         if (articlesPagingItems.loadState.refresh is LoadState.NotLoading) {
             listState.scrollToItem(0)

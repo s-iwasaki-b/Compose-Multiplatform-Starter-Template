@@ -9,7 +9,7 @@ This already includes a basic module structure and dependencies, following the [
 Currently, the targets are Android and iOS.
 
 
-# How to Use
+# Usage
 [Create your repository from this template repository](https://github.com/new?template_name=Compose-Multiplatform-Starter-Template&template_owner=s-iwasaki-b)
 
 ### Rename Package

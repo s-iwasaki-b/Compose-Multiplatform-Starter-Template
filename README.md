@@ -17,14 +17,14 @@ Currently, the targets are Android and iOS.
 
 | Name | Version | Description |
 |:--|:--|:--|
-| [koin](https://github.com/InsertKoinIO/koin) | 4.0.0 | For dependency injection. |
-| [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) | 1.2.0 | For key-value data source such as [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences). |
-| [ktor](https://github.com/ktorio/ktor) | 2.3.12 | For HTTP client. |
-| [Ktorfit](https://github.com/Foso/Ktorfit) | 2.1.0 | For API interface such as [Retrofit](https://github.com/square/retrofit). |
-| [multiplatform-paging](https://github.com/cashapp/multiplatform-paging) | 3.3.0-alpha02-0.5.1 | For paging. |
-| [coil](https://github.com/coil-kt/coil?tab=readme-ov-file#jetpack-compose) | 3.0.0-rc01 | For async image loading. |
-| [Mokkery](https://github.com/lupuuss/Mokkery) | 2.4.0 | For mocking such as [MockK](https://github.com/mockk/mockk?tab=readme-ov-file). |
-| [Napier](https://github.com/AAkira/Napier) | 2.7.1 | For logging. In this repository, it is implemented to output only in debug build.  |
+| [koin](https://github.com/InsertKoinIO/koin) | 4.0.0 | Dependency Injection |
+| [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) | 1.2.0 | Key-Value data source such as [SharedPreferences](https://developer.android.com/reference/android/content/SharedPreferences) |
+| [ktor](https://github.com/ktorio/ktor) | 2.3.12 | HTTP client |
+| [Ktorfit](https://github.com/Foso/Ktorfit) | 2.1.0 | REST API interface such as [Retrofit](https://github.com/square/retrofit) |
+| [multiplatform-paging](https://github.com/cashapp/multiplatform-paging) | 3.3.0-alpha02-0.5.1 | Paging |
+| [coil](https://github.com/coil-kt/coil?tab=readme-ov-file#jetpack-compose) | 3.0.0-rc01 | Loading async image |
+| [Mokkery](https://github.com/lupuuss/Mokkery) | 2.4.0 | Mocking such as [MockK](https://github.com/mockk/mockk?tab=readme-ov-file) |
+| [Napier](https://github.com/AAkira/Napier) | 2.7.1 | Logging, it is implemented to output only in debug build in this repository |
 
 
 # Demo

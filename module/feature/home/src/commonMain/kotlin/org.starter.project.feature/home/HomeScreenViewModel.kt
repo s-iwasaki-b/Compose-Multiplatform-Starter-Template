@@ -14,8 +14,7 @@ import org.starter.project.domain.service.ZennService
 import org.starter.project.feature.home.component.paging.ArticlesPagingSource
 import org.starter.project.ui.extension.handle
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
-import org.starter.project.ui.shared.handler.IgnoreExceptionHandler
-import org.starter.project.ui.shared.handler.SnackBarThrowableHandler
+import org.starter.project.ui.shared.handler.IgnoreThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
@@ -65,7 +64,7 @@ class HomeScreenViewModel(
     }.flow.cachedIn(viewModelScope)
 
     fun initKeyword() {
-        val lastKeyword = zennService.getLastKeyword().handle(IgnoreExceptionHandler()).orEmpty()
+        val lastKeyword = zennService.getLastKeyword().handle(IgnoreThrowableHandler()).orEmpty()
         _state.update {
             it.copy(
                 searchKeyword = lastKeyword

@@ -1,9 +1,12 @@
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org)
 [![GitHub](https://img.shields.io/github/license/s-iwasaki-b/Compose-Multiplatform-Starter-Template)](https://github.com/s-iwasaki-b/Compose-Multiplatform-Starter-Template/blob/main/LICENSE)
 
 # Overview
-This is starter template to develop multiplatform application by using jetpack compose.
+This is starter template to develop multiplatform application by using [Compose Multiplatform](https://www.jetbrains.com/compose-multiplatform/).
 
 This already includes a basic module structure and dependencies, following the [Android Architecture Guide](https://developer.android.com/topic/architecture), so you can start development with Compose Multiplatform right away.
+
+Currently, the targets are Android and iOS.
 
 
 # Architecture

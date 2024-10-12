@@ -24,7 +24,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(libs.bundles.base)
-            implementation(compose.ui)
         }
     }
 }

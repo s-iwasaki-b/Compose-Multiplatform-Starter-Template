@@ -1,21 +1,28 @@
 package org.starter.project.core.api
 
 import de.jensklingenberg.ktorfit.Ktorfit
-import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.HttpClientEngineConfig
+import io.ktor.client.engine.HttpClientEngineFactory
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.HttpStatusCode
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.starter.project.base.error.ApiError
 import org.starter.project.base.error.ApiErrorResponse
 
+internal expect val engine: HttpClientEngineFactory<HttpClientEngineConfig>
+
 object ApiClient {
-    private val client = HttpClient {
+    private val client = HttpClient(engine) {
         defaultRequest {
             url(ApiConfig.API_BASE_URL)
         }
@@ -28,7 +35,8 @@ object ApiClient {
         expectSuccess = true
         HttpResponseValidator {
             handleResponseExceptionWithRequest { exception, _ ->
-                val clientException = exception as? ClientRequestException ?: return@handleResponseExceptionWithRequest
+                val clientException = exception as? ClientRequestException
+                    ?: return@handleResponseExceptionWithRequest
                 val exceptionResponse = clientException.response
                 val errorResponse = exceptionResponse.body<ApiErrorResponse>()
                 throw when (exceptionResponse.status) {

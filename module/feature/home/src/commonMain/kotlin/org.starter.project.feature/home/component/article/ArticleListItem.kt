@@ -23,8 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
+import coil3.compose.AsyncImage
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.design.system.theme.DesignSystemTheme
 
@@ -76,8 +75,8 @@ fun ArticleListItem(
                     text = article.likedCount.toString()
                 )
                 Spacer(modifier = Modifier.width(12.dp))
-                KamelImage(
-                    resource = asyncPainterResource(article.user.avatarSmallUrl),
+                AsyncImage(
+                    model = article.user.avatarSmallUrl,
                     contentDescription = null,
                     modifier = Modifier.size(12.dp)
                 )

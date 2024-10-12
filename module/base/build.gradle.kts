@@ -31,6 +31,9 @@ kotlin {
 android {
     namespace = "$PACKAGE_NAME.base"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         consumerProguardFiles("proguard-rules.pro")
     }

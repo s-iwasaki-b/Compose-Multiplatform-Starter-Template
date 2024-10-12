@@ -46,7 +46,7 @@ object ApiClient {
             }
             level = LogLevel.ALL
         }
-    }.also { Napier.base(DebugAntilog()) }
+    }
 
     val ktorfit: Ktorfit = Ktorfit.Builder().httpClient(client).build()
 }

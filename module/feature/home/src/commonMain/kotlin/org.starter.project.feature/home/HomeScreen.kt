@@ -79,15 +79,9 @@ private fun HomeScreenContent(
                 Spacer(modifier = Modifier.height(16.dp))
                 SearchBar(
                     value = state.searchKeyword,
-                    onValueChange = {
-                        dispatch(HomeScreenEvent.OnChangeSearchKeyword(it))
-                    },
-                    onTapClear = {
-                        dispatch(HomeScreenEvent.OnTapClearSearchKeyword)
-                    },
-                    onTapAction = {
-                        dispatch(HomeScreenEvent.OnTapActionSearchKeyword)
-                    }
+                    onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },
+                    onTapClear = { dispatch(HomeScreenEvent.OnTapClearSearchKeyword) },
+                    onTapAction = { dispatch(HomeScreenEvent.OnTapActionSearchKeyword) }
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }

@@ -1,3 +1,5 @@
+[![GitHub](https://img.shields.io/github/license/s-iwasaki-b/Compose-Multiplatform-Starter-Template)](https://github.com/s-iwasaki-b/Compose-Multiplatform-Starter-Template/blob/main/LICENSE)
+
 # Overview
 This is starter template to develop multiplatform application by using jetpack compose.
 

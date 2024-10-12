@@ -24,7 +24,7 @@ Currently, the targets are Android and iOS.
 | [multiplatform-paging](https://github.com/cashapp/multiplatform-paging) | 3.3.0-alpha02-0.5.1 | For paging. |
 | [coil](https://github.com/coil-kt/coil?tab=readme-ov-file#jetpack-compose) | 3.0.0-rc01 | For async image loading. |
 | [Mokkery](https://github.com/lupuuss/Mokkery) | 2.4.0 | For mocking such as [MockK](https://github.com/mockk/mockk?tab=readme-ov-file). |
-| [Napier](https://github.com/AAkira/Napier) | 2.7.1 | For logging. |
+| [Napier](https://github.com/AAkira/Napier) | 2.7.1 | For logging. In this repository, it is implemented to output only in debug build.  |
 
 
 # Demo

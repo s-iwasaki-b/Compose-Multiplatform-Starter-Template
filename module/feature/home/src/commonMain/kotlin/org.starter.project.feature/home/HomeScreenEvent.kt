@@ -9,7 +9,7 @@ internal sealed interface HomeScreenEvent : ScreenEvent {
     data object OnTapErrorScreenAction : HomeScreenEvent
     data class OnChangeSearchKeyword(val keyword: String) : HomeScreenEvent
     data object OnTapClearSearchKeyword : HomeScreenEvent
-    data object OnTapCancelSearchKeyword : HomeScreenEvent
+    data object OnTapActionSearchKeyword : HomeScreenEvent
 }
 
 internal object HomeScreenEventHandler {
@@ -28,10 +28,11 @@ internal object HomeScreenEventHandler {
             }
             HomeScreenEvent.OnTapClearSearchKeyword -> {
                 viewModel.updateSearchKeyword("")
+                articlesPagingItems.refresh()
             }
-            HomeScreenEvent.OnTapCancelSearchKeyword -> {
-                viewModel.updateSearchKeyword("")
+            HomeScreenEvent.OnTapActionSearchKeyword -> {
                 focusManager.clearFocus()
+                articlesPagingItems.refresh()
             }
             else -> {
                 /* no-op */

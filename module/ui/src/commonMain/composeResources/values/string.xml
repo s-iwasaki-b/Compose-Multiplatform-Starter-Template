@@ -6,5 +6,5 @@
 
     <!-- Design System -->
     <string name="search_bar_default_placeholder">検索</string>
-    <string name="search_bar_cancel">キャンセル</string>
+    <string name="search_bar_default_action">検索</string>
 </resources>

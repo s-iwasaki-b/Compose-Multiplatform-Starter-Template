@@ -35,7 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.starter.project.ui.design.system.theme.DesignSystemTheme
 import org.starter.project.ui.resources.Res
-import org.starter.project.ui.resources.search_bar_cancel
+import org.starter.project.ui.resources.search_bar_default_action
 import org.starter.project.ui.resources.search_bar_default_placeholder
 
 @Preview
@@ -46,7 +46,7 @@ fun SearchBar(
     placeholder: String = stringResource(Res.string.search_bar_default_placeholder),
     onValueChange: (String) -> Unit,
     onTapClear: () -> Unit = {},
-    onTapCancel: () -> Unit = {}
+    onTapAction: () -> Unit = {}
 ) {
     val focusState = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -113,17 +113,18 @@ fun SearchBar(
             ),
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
+                onTapAction()
             }
         )
         if (focusState.value) {
             Text(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .clickable { onTapCancel() }
+                    .clickable { onTapAction() }
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 style = DesignSystemTheme.typography.body2,
                 color = Color.Black,
-                text = stringResource(Res.string.search_bar_cancel),
+                text = stringResource(Res.string.search_bar_default_action),
                 textAlign = TextAlign.Center
             )
         }

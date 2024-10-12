@@ -39,10 +39,6 @@ fun HomeScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { Napier.d { "HomeScreen.onPause" } }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { Napier.d { "HomeScreen.onStop" } }
 
-    LaunchedEffect(state.searchKeyword) {
-        articlesPagingItems.refresh()
-    }
-
     HomeScreenContent(
         state = state,
         articlesPagingItems = articlesPagingItems,
@@ -86,8 +82,8 @@ private fun HomeScreenContent(
                     onTapClear = {
                         dispatch(HomeScreenEvent.OnTapClearSearchKeyword)
                     },
-                    onTapCancel = {
-                        dispatch(HomeScreenEvent.OnTapCancelSearchKeyword)
+                    onTapAction = {
+                        dispatch(HomeScreenEvent.OnTapActionSearchKeyword)
                     }
                 )
                 Spacer(modifier = Modifier.height(16.dp))

@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ fun SearchBar(
     onTapClear: () -> Unit = {},
     onTapAction: () -> Unit = {}
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
     val focusState = remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
 
@@ -113,6 +115,7 @@ fun SearchBar(
             ),
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
+                keyboardController?.hide()
                 onTapAction()
             }
         )

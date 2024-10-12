@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import org.starter.project.domain.service.ZennService
 import org.starter.project.feature.home.component.paging.ArticlesPagingSource
 import org.starter.project.ui.extension.handle
+import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.handler.IgnoreExceptionHandler
 import org.starter.project.ui.shared.handler.SnackBarThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
@@ -48,15 +49,17 @@ class HomeScreenViewModel(
                 }
             },
             onLoadedFirstPage = {
-                _screenState.update {
-                    it.copy(screenLoadingState = ScreenLoadingState.Success())
+                if (_screenState.value.screenLoadingState !is ScreenLoadingState.Failure) {
+                    _screenState.update {
+                        it.copy(screenLoadingState = ScreenLoadingState.Success())
+                    }
                 }
             },
             fetcher = { key ->
                 zennService.fetchArticles(
                     keyword = _state.value.searchKeyword,
                     nextPage = key
-                ).handle(SnackBarThrowableHandler(_screenState))
+                ).handle(ErrorScreenThrowableHandler(_screenState))
             }
         )
     }.flow.cachedIn(viewModelScope)

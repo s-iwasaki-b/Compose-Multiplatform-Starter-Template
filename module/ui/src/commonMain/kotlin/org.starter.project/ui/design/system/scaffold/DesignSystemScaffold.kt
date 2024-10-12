@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Scaffold
@@ -63,7 +66,9 @@ fun DesignSystemScaffold(
         topBar = {
             topBar?.let {
                 Box(
-                    modifier = Modifier.background(color = backgroundColor).statusBarsPadding()
+                    modifier = Modifier
+                        .background(color = backgroundColor)
+                        .statusBarsPadding()
                 ) {
                     topBar()
                 }
@@ -81,7 +86,7 @@ fun DesignSystemScaffold(
             ErrorContent(
                 modifier = if (topBar != null) Modifier.padding(top = 32.dp) else Modifier,
                 title = stringResource(Res.string.loading_failure_default_message),
-                message = screenState.screenLoadingState.throwable.message.orEmpty(),
+                message = screenState.screenLoadingState.throwable.message,
                 actionLabel = stringResource(Res.string.loading_failure_default_action_label),
                 onTapActionButton = onTapErrorActionButton
             )
@@ -103,31 +108,35 @@ fun DesignSystemScaffold(
 fun ErrorContent(
     modifier: Modifier = Modifier,
     title: String,
-    message: String,
+    message: String?,
     actionLabel: String,
     onTapActionButton: (() -> Unit)? = null
 ) {
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(DesignSystemTheme.colors.background)
-            .padding(horizontal = 16.dp)
+            .background(DesignSystemTheme.colors.background),
+        contentAlignment = Alignment.Center
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            style = DesignSystemTheme.typography.subtitle1,
-            color = Color.Black,
-            text = title
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(
-            style = DesignSystemTheme.typography.body1,
-            color = Color.DarkGray,
-            text = message
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        onTapActionButton?.let {
-            // TODO: add Button
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                style = DesignSystemTheme.typography.subtitle2,
+                text = title
+            )
+            message?.let {
+                Text(
+                    style = DesignSystemTheme.typography.caption,
+                    text = it
+                )
+            }
+            onTapActionButton?.let {
+                Button(
+                    shape = CircleShape,
+                    onClick = it
+                ) {
+                    Text(text = actionLabel)
+                }
+            }
         }
     }
 }

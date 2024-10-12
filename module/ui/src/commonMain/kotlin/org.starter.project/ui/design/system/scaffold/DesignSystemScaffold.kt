@@ -105,7 +105,7 @@ fun DesignSystemScaffold(
 }
 
 @Composable
-fun ErrorContent(
+private fun ErrorContent(
     modifier: Modifier = Modifier,
     title: String,
     message: String?,

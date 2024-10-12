@@ -5,6 +5,6 @@
     <string name="loading_failure_default_action_label">再度読み込む</string>
 
     <!-- Design System -->
-    <string name="search_bar_default_placeholder">検索</string>
+    <string name="search_bar_default_placeholder">パブリケーション名またはユーザ名</string>
     <string name="search_bar_default_action">検索</string>
 </resources>

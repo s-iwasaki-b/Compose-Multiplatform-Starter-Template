@@ -7,4 +7,5 @@ interface ZennService : Service {
         keyword: String,
         nextPage: String?
     ): Result<Articles>
+    fun getLastKeyword(): Result<String?>
 }

@@ -14,6 +14,8 @@ open class ZennServiceImpl(
         keyword: String,
         nextPage: String?
     ) = resultHandler.async {
+        zennRepository.updateLastKeyword(keyword)
+
         val keywordAsPublicationNameResult = zennRepository.fetchArticles(
             publicationName = keyword,
             page = nextPage
@@ -27,5 +29,9 @@ open class ZennServiceImpl(
         } else {
             keywordAsPublicationNameResult
         }
+    }
+
+    override fun getLastKeyword() = resultHandler.immediate {
+        zennRepository.getLastKeyword()
     }
 }

@@ -16,18 +16,18 @@ open class ZennServiceImpl(
     ) = resultHandler.async {
         zennRepository.updateLastKeyword(keyword)
 
-        val keywordAsPublicationNameResult = zennRepository.fetchArticles(
+        val publicationArticles = zennRepository.fetchArticles(
             publicationName = keyword,
             page = nextPage
         )
 
-        return@async if (keywordAsPublicationNameResult.articles.isEmpty()) {
+        return@async if (publicationArticles.articles.isEmpty()) {
             zennRepository.fetchArticles(
                 userName = keyword,
                 page = nextPage
             )
         } else {
-            keywordAsPublicationNameResult
+            publicationArticles
         }
     }
 

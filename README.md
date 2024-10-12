@@ -2,6 +2,7 @@
 
 # Overview
 This is starter template to develop multiplatform application by using jetpack compose.
+This already includes a basic module structure and dependencies, following the [Android Architecture Guide](https://developer.android.com/topic/architecture), so you can start development with Compose Multiplatform right away.
 
 
 # Architecture

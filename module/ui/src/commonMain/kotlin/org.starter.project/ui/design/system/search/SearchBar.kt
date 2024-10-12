@@ -72,7 +72,7 @@ fun SearchBar(
             cursorBrush = SolidColor(DesignSystemTheme.colors.primary),
             decorationBox = { innerTextField ->
                 Row(
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {

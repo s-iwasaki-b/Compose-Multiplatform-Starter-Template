@@ -1,5 +1,7 @@
 package org.starter.project.feature.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -22,6 +24,7 @@ import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.feature.home.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.DesignSystemScaffold
 import org.starter.project.ui.design.system.search.SearchBar
+import org.starter.project.ui.design.system.theme.DesignSystemTheme
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
@@ -56,6 +59,7 @@ fun HomeScreen(
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HomeScreenContent(
     state: HomeScreenState,
@@ -75,15 +79,16 @@ private fun HomeScreenContent(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            item(key = "search_bar") {
-                Spacer(modifier = Modifier.height(16.dp))
+            stickyHeader(key = "search_bar") {
                 SearchBar(
+                    modifier = Modifier
+                        .background(DesignSystemTheme.colors.background)
+                        .padding(vertical = 16.dp),
                     value = state.searchKeyword,
                     onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },
                     onTapClear = { dispatch(HomeScreenEvent.OnTapClearSearchKeyword) },
                     onTapAction = { dispatch(HomeScreenEvent.OnTapActionSearchKeyword) }
                 )
-                Spacer(modifier = Modifier.height(16.dp))
             }
             articleList(articlesPagingItems)
         }

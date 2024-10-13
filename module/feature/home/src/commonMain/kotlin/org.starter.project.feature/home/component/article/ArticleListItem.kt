@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import org.starter.project.base.data.model.zenn.Article
-import org.starter.project.ui.design.system.theme.DesignSystemTheme
+import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
 fun ArticleListItem(
@@ -35,10 +35,10 @@ fun ArticleListItem(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .background(DesignSystemTheme.colors.background)
+            .background(SystemTheme.colors.background)
             .border(
                 width = 1.dp,
-                color = DesignSystemTheme.colors.onSurface.copy(alpha = 0.12f),
+                color = SystemTheme.colors.onSurface.copy(alpha = 0.12f),
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(vertical = 8.dp, horizontal = 12.dp),
@@ -46,7 +46,7 @@ fun ArticleListItem(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            style = DesignSystemTheme.typography.h4,
+            style = SystemTheme.typography.h4,
             text = article.emoji,
         )
         Column(
@@ -54,7 +54,7 @@ fun ArticleListItem(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                style = DesignSystemTheme.typography.subtitle2,
+                style = SystemTheme.typography.subtitle2,
                 text = article.title,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -70,7 +70,7 @@ fun ArticleListItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    style = DesignSystemTheme.typography.caption,
+                    style = SystemTheme.typography.caption,
                     color = Color.DarkGray,
                     text = article.likedCount.toString()
                 )
@@ -82,7 +82,7 @@ fun ArticleListItem(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    style = DesignSystemTheme.typography.caption,
+                    style = SystemTheme.typography.caption,
                     color = Color.DarkGray,
                     text = article.user.name,
                     maxLines = 1,

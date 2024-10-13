@@ -11,16 +11,16 @@ import androidx.compose.ui.Modifier
 import org.koin.compose.KoinApplication
 import org.starter.project.di.koin
 import org.starter.project.feature.home.HomeScreen
-import org.starter.project.ui.design.system.theme.DesignSystemTheme
+import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
 fun MainApp() {
     KoinApplication(koin()) {
-        DesignSystemTheme {
+        SystemTheme {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(DesignSystemTheme.colors.background)
+                    .background(SystemTheme.colors.background)
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
                 HomeScreen()

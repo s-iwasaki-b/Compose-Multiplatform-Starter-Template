@@ -21,9 +21,9 @@ import io.github.aakira.napier.Napier
 import org.koin.compose.viewmodel.koinViewModel
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.feature.home.component.article.articleList
-import org.starter.project.ui.design.system.scaffold.DesignSystemScaffold
-import org.starter.project.ui.design.system.search.SearchBar
-import org.starter.project.ui.design.system.theme.DesignSystemTheme
+import org.starter.project.ui.design.system.scaffold.SystemScaffold
+import org.starter.project.ui.design.system.search.SystemSearchBar
+import org.starter.project.ui.design.system.theme.SystemTheme
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
@@ -71,7 +71,7 @@ private fun HomeScreenContent(
         }
     }
 
-    DesignSystemScaffold(
+    SystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
         onTapErrorActionButton = {
@@ -86,9 +86,9 @@ private fun HomeScreenContent(
             state = listState
         ) {
             stickyHeader(key = "search_bar") {
-                SearchBar(
+                SystemSearchBar(
                     modifier = Modifier
-                        .background(DesignSystemTheme.colors.background)
+                        .background(SystemTheme.colors.background)
                         .padding(vertical = 16.dp),
                     value = state.searchKeyword,
                     onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },

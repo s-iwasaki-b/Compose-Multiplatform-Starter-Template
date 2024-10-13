@@ -19,7 +19,7 @@ tasks.register("changePackageName") {
     val fileExtensions = listOf("kt", "xml", "xcconfig")
 
     doLast {
-        if (newPackageName == null) {
+        if (newPackageName.isNullOrEmpty()) {
             throw GradleException("Error: Please provide the new package name using -PnewPackageName=...")
         }
 

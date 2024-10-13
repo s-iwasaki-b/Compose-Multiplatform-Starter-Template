@@ -41,8 +41,8 @@ tasks.register("changePackageName") {
             sourceSets.forEach { sourceSet ->
                 val oldPackageDir = oldPackageName.replace(".", "/")
                 val newPackageDir = newPackageName.replace(".", "/")
-                val oldDirPath = projectDir.resolve("src/$sourceSet/kotlin/$oldPackageDir")
-                val newDirPath = projectDir.resolve("src/$sourceSet/kotlin/$newPackageDir")
+                val oldDirPath = srcDir.resolve("$sourceSet/kotlin/$oldPackageDir")
+                val newDirPath = srcDir.resolve("$sourceSet/kotlin/$newPackageDir")
 
                 if (oldDirPath.exists()) {
                     newDirPath.parentFile.mkdirs()

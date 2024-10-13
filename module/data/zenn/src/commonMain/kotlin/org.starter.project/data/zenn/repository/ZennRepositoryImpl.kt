@@ -7,11 +7,10 @@ import org.starter.project.data.zenn.converter.ArticlesConverter
 import org.starter.project.data.zenn.datasource.api.ZennApi
 import org.starter.project.data.zenn.datasource.api.createZennApi
 import org.starter.project.data.zenn.datasource.preferences.ZennPreferences
-import org.starter.project.data.zenn.datasource.preferences.ZennPreferencesImpl
 
 class ZennRepositoryImpl(
     private val zennApi: ZennApi = ApiClient.ktorfit.createZennApi(),
-    private val zennPreferences: ZennPreferences = ZennPreferencesImpl()
+    private val zennPreferences: ZennPreferences
 ) : ZennRepository {
     override suspend fun fetchArticles(
         userName: String?,

@@ -25,7 +25,7 @@ kotlin {
         }
         commonMain.dependencies {
             api(projects.module.base)
-            implementation(libs.bundles.core)
+            api(libs.bundles.core)
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)

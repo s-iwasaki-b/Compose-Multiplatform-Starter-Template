@@ -1,24 +1,23 @@
-package org.starter.project.base.app
+package org.starter.project.app
 
 import android.app.Application
-import android.content.Context
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import org.koin.android.ext.koin.androidContext
 import org.starter.project.base.BuildConfig
+import org.starter.project.di.startKoin
 
 class App : Application() {
-    companion object {
-        private lateinit var instance: App
-
-        fun provideContext(): Context {
-            return instance.applicationContext
+    init {
+        if (BuildConfig.DEBUG) {
+            Napier.base(DebugAntilog())
         }
     }
 
-    init {
-        instance = this
-        if (BuildConfig.DEBUG) {
-            Napier.base(DebugAntilog())
+    override fun onCreate() {
+        super.onCreate()
+        startKoin {
+            androidContext(this@App)
         }
     }
 }

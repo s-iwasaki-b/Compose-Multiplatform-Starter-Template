@@ -2,9 +2,6 @@ package org.starter.project.core.preferences
 
 import com.russhwolf.settings.Settings
 
-internal expect val factory: Settings.Factory
-
-object PreferencesConfig {
-    val zennPreferences: Settings
-        get() = factory.create("zenn_preferences")
+class PreferencesConfig(factory: Settings.Factory) {
+    val zennPreferences: Settings = factory.create("zenn_preferences")
 }

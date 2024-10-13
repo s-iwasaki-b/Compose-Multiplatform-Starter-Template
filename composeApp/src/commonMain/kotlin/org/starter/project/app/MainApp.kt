@@ -8,14 +8,13 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import org.koin.compose.KoinApplication
-import org.starter.project.di.koin
+import org.koin.compose.KoinContext
 import org.starter.project.feature.home.HomeScreen
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
 fun MainApp() {
-    KoinApplication(koin()) {
+    KoinContext {
         SystemTheme {
             Box(
                 modifier = Modifier

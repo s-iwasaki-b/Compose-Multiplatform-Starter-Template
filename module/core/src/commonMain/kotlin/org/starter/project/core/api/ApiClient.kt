@@ -21,7 +21,11 @@ import org.starter.project.base.error.ApiErrorResponse
 
 internal expect val engine: HttpClientEngineFactory<HttpClientEngineConfig>
 
-object ApiClient {
+interface ApiClient {
+    val ktorfit: Ktorfit
+}
+
+class ApiClientImpl : ApiClient {
     private val client = HttpClient(engine) {
         defaultRequest {
             url(ApiConfig.API_BASE_URL)
@@ -56,5 +60,5 @@ object ApiClient {
         }
     }
 
-    val ktorfit: Ktorfit = Ktorfit.Builder().httpClient(client).build()
+    override val ktorfit: Ktorfit = Ktorfit.Builder().httpClient(client).build()
 }

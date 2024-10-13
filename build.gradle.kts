@@ -37,19 +37,21 @@ tasks.register("changePackageName") {
         }
 
         println("Changing package directory from $oldPackageName to $newPackageName")
-        sourceSets.forEach { sourceSet ->
-            val oldPackageDir = oldPackageName.replace(".", "/")
-            val newPackageDir = newPackageName.replace(".", "/")
-            val oldDirPath = projectDir.resolve("src/$sourceSet/kotlin/$oldPackageDir")
-            val newDirPath = projectDir.resolve("src/$sourceSet/kotlin/$newPackageDir")
+        projectDir.walkTopDown().filter { it.isDirectory && it.name == "src" }.forEach { srcDir ->
+            sourceSets.forEach { sourceSet ->
+                val oldPackageDir = oldPackageName.replace(".", "/")
+                val newPackageDir = newPackageName.replace(".", "/")
+                val oldDirPath = projectDir.resolve("src/$sourceSet/kotlin/$oldPackageDir")
+                val newDirPath = projectDir.resolve("src/$sourceSet/kotlin/$newPackageDir")
 
-            if (oldDirPath.exists()) {
-                newDirPath.parentFile.mkdirs()
-                oldDirPath.copyRecursively(newDirPath, overwrite = true)
-                oldDirPath.deleteRecursively()
-                println("Updated directory structure from $oldDirPath to $newDirPath")
-            } else {
-                println("Not Found directory: $oldDirPath")
+                if (oldDirPath.exists()) {
+                    newDirPath.parentFile.mkdirs()
+                    oldDirPath.copyRecursively(newDirPath, overwrite = true)
+                    oldDirPath.deleteRecursively()
+                    println("Updated directory structure from $oldDirPath to $newDirPath")
+                } else {
+                    println("Not Found directory: $oldDirPath")
+                }
             }
         }
     }

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.starter.project.domain.service.ZennService
 import org.starter.project.feature.home.component.paging.ArticlesPagingSource
-import org.starter.project.ui.extension.handle
+import org.starter.project.base.extension.handle
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.handler.IgnoreThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState

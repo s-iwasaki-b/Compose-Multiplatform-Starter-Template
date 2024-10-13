@@ -16,7 +16,7 @@ plugins {
 tasks.register("changePackageName") {
     val oldPackageName = PACKAGE_NAME
     val newPackageName: String? = project.findProperty("newPackageName") as String?
-    val sourceSets = listOf("androidMain", "commonMain", "iosMain")
+    val sourceSets = listOf("androidMain", "commonMain", "iosMain", "commonTest")
     val fileExtensions = listOf("kt", "xml", "xcconfig")
 
     doLast {

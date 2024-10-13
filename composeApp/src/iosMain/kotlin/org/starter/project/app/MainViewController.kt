@@ -5,4 +5,4 @@ import org.starter.project.di.startKoin
 
 fun MainViewController() = ComposeUIViewController(
     configure = { startKoin() }
-) { MainApp() }
+) { Main() }

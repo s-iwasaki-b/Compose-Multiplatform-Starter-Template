@@ -13,7 +13,7 @@ import org.starter.project.feature.home.HomeScreen
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-fun MainApp() {
+fun Main() {
     KoinContext {
         SystemTheme {
             Box(

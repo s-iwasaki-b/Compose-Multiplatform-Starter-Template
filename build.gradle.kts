@@ -13,6 +13,30 @@ plugins {
     alias(libs.plugins.mokkery) apply false
 }
 
+tasks.register("changeProjectName") {
+    val oldProjectName = rootProject.name
+    val newProjectName: String? = project.findProperty("newProjectName") as String?
+    val fileExtensions = listOf("kts", "xml", "xcconfig", "xcscheme", "pbxproj")
+
+    doLast {
+        if (newProjectName.isNullOrEmpty()) {
+            throw GradleException("Error: Please provide the new project name using -PnewProjectName=...")
+        }
+
+        println("Changing project name from $oldProjectName to $newProjectName")
+        project.projectDir.walkTopDown().forEach { file ->
+            if (file.isFile && fileExtensions.any { file.name.endsWith(it) }) {
+                val fileText = file.readText()
+                if (fileText.contains(oldProjectName)) {
+                    val newText = fileText.replace(oldProjectName, newProjectName)
+                    file.writeText(newText)
+                    println("Updated project name in ${file.path}")
+                }
+            }
+        }
+    }
+}
+
 tasks.register("changePackageName") {
     val oldPackageName = PACKAGE_NAME
     val newPackageName: String? = project.findProperty("newPackageName") as String?

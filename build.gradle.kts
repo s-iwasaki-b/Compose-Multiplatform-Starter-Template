@@ -60,7 +60,8 @@ tasks.register("changePackageName") {
                 if (oldDirPath.exists()) {
                     newDirPath.parentFile.mkdirs()
                     oldDirPath.copyRecursively(newDirPath, overwrite = true)
-                    deleteEmptyParentDirs(oldDirPath)
+                    oldDirPath.deleteRecursively()
+                    deleteEmptyParentDirs(oldDirPath.parentFile)
                     println("Updated directory structure from $oldDirPath to $newDirPath")
                 } else {
                     println("Not Found directory: $oldDirPath")

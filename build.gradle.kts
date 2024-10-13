@@ -36,6 +36,19 @@ tasks.register("changePackageName") {
             }
         }
 
+        fun deleteEmptyParentDirs(dir: File) {
+            var currentDir: File? = dir
+            while (currentDir != null && currentDir != projectDir) {
+                if (currentDir.listFiles()?.isEmpty() == true) {
+                    currentDir.delete()
+                    println("Deleted empty directory: $currentDir")
+                    currentDir = currentDir.parentFile
+                } else {
+                    break
+                }
+            }
+        }
+
         println("Changing package directory from $oldPackageName to $newPackageName")
         projectDir.walkTopDown().filter { it.isDirectory && it.name == "src" }.forEach { srcDir ->
             sourceSets.forEach { sourceSet ->
@@ -47,7 +60,7 @@ tasks.register("changePackageName") {
                 if (oldDirPath.exists()) {
                     newDirPath.parentFile.mkdirs()
                     oldDirPath.copyRecursively(newDirPath, overwrite = true)
-                    oldDirPath.deleteRecursively()
+                    deleteEmptyParentDirs(oldDirPath)
                     println("Updated directory structure from $oldDirPath to $newDirPath")
                 } else {
                     println("Not Found directory: $oldDirPath")

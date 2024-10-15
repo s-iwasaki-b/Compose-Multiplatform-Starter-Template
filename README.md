@@ -12,8 +12,28 @@ Currently, the targets are Android and iOS.
 # Usage
 [Create your repository from this template](https://github.com/new?template_name=Compose-Multiplatform-Starter-Template&template_owner=s-iwasaki-b)
 
-### Rename Package
-TODO
+### How to Rename
+Gradle task is available for renaming projects and packages.  
+Please follow the steps below to use it. 
+
+Be sure to finish this setup in the template's initial state.  
+Its behavior during development has not been confirmed.
+
+#### 1. Rename Project Name
+The default project name is `StarterProject`.  
+Execute gradle task named `ChangeProjectName` from Run Configurations, and input new project name in configuration settings, finally click Run.
+
+<img width="400" alt="スクリーンショット 2024-10-14 0 22 04" src="https://github.com/user-attachments/assets/b38f9b1f-5813-489d-8f44-b1cf3f1b9e89">
+
+
+#### 2. Rename Package Name
+The default package name is `org.starter.project`.  
+Execute `ChangePackageName` in the same way as step 1.
+
+<img width="400" alt="スクリーンショット 2024-10-14 0 08 02" src="https://github.com/user-attachments/assets/615a127b-5041-426a-a513-8ae69f9d1376">
+
+#### 3. Gradle Sync
+Finally run gradle sync and restart Android Studio before building.
 
 # Architecture
 ![Compose Multiplatform Starter Repository Architecture](https://github.com/user-attachments/assets/90445e4b-ceda-47d3-a21b-b2461c7e3eab)

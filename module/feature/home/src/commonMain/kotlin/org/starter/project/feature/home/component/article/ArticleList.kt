@@ -3,13 +3,12 @@ package org.starter.project.feature.home.component.article
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.Divider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.cash.paging.compose.LazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
 
-fun LazyListScope.articleList(
+internal fun LazyListScope.articleList(
     articlesPagingItems: LazyPagingItems<Article>,
 ) {
     items(

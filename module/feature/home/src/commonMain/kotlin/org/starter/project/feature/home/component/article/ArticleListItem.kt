@@ -28,7 +28,7 @@ import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-fun ArticleListItem(
+internal fun ArticleListItem(
     article: Article
 ) {
     Row(

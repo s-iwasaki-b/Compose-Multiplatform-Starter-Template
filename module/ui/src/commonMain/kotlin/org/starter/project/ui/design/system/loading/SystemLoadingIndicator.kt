@@ -9,8 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.starter.project.ui.design.system.theme.SystemTheme
 
+@Preview
 @Composable
 fun SystemLoadingIndicator() {
     Box(

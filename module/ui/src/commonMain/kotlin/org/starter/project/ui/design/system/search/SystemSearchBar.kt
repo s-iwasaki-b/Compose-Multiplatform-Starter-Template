@@ -39,13 +39,12 @@ import org.starter.project.ui.resources.Res
 import org.starter.project.ui.resources.search_bar_default_action
 import org.starter.project.ui.resources.search_bar_default_placeholder
 
-@Preview
 @Composable
 fun SystemSearchBar(
     modifier: Modifier = Modifier,
     value: String = "",
     placeholder: String = stringResource(Res.string.search_bar_default_placeholder),
-    onValueChange: (String) -> Unit,
+    onValueChange: (String) -> Unit = {},
     onTapClear: () -> Unit = {},
     onTapAction: () -> Unit = {}
 ) {
@@ -135,5 +134,15 @@ fun SystemSearchBar(
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+@Preview
+@Composable
+private fun SystemSearchBarPreview() {
+    SystemTheme {
+        SystemSearchBar(
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

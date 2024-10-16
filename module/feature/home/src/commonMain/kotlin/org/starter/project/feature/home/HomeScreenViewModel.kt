@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.starter.project.base.data.model.zenn.Articles
 import org.starter.project.domain.service.ZennService
 import org.starter.project.feature.home.component.paging.ArticlesPagingSource
 import org.starter.project.base.extension.handle
@@ -42,26 +43,32 @@ class HomeScreenViewModel(
         PagingConfig(ArticlesPagingSource.PAGE_SIZE)
     ) {
         ArticlesPagingSource(
-            onRefresh = {
-                _screenState.update {
-                    it.copy(screenLoadingState = ScreenLoadingState.Loading())
-                }
-            },
-            onLoadedFirstPage = {
-                if (_screenState.value.screenLoadingState !is ScreenLoadingState.Failure) {
-                    _screenState.update {
-                        it.copy(screenLoadingState = ScreenLoadingState.Success())
-                    }
-                }
-            },
-            fetcher = { key ->
-                zennService.fetchArticles(
-                    keyword = _state.value.searchKeyword,
-                    nextPage = key
-                ).handle(ErrorScreenThrowableHandler(_screenState))
-            }
+            onRefresh = ::updateScreenLoading,
+            onLoadedFirstPage = ::updateScreenSuccess,
+            fetcher = ::fetchArticles
         )
     }.flow.cachedIn(viewModelScope)
+
+    private fun updateScreenLoading() {
+        _screenState.update {
+            it.copy(screenLoadingState = ScreenLoadingState.Loading())
+        }
+    }
+
+    private fun updateScreenSuccess() {
+        if (_screenState.value.screenLoadingState !is ScreenLoadingState.Failure) {
+            _screenState.update {
+                it.copy(screenLoadingState = ScreenLoadingState.Success())
+            }
+        }
+    }
+
+    private suspend fun fetchArticles(key: String?): Articles? {
+        return zennService.fetchArticles(
+            keyword = _state.value.searchKeyword,
+            nextPage = key
+        ).handle(ErrorScreenThrowableHandler(_screenState))
+    }
 
     fun initSearchKeyword() {
         val lastKeyword = zennService.getLastKeyword().handle(IgnoreThrowableHandler()).orEmpty()

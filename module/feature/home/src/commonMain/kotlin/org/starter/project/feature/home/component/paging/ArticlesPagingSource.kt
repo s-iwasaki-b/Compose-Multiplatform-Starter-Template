@@ -5,8 +5,7 @@ import androidx.paging.PagingState
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.base.data.model.zenn.Articles
 
-
-class ArticlesPagingSource(
+internal class ArticlesPagingSource(
     private val onRefresh: () -> Unit = {},
     private val onLoadedFirstPage: () -> Unit = {},
     private val fetcher: suspend (key: String?) -> Articles?,

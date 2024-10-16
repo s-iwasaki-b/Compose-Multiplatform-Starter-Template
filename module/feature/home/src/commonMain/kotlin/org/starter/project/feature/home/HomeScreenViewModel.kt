@@ -1,5 +1,6 @@
 package org.starter.project.feature.home
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -11,9 +12,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.starter.project.base.data.model.zenn.Articles
+import org.starter.project.base.extension.handle
 import org.starter.project.domain.service.ZennService
 import org.starter.project.feature.home.component.paging.ArticlesPagingSource
-import org.starter.project.base.extension.handle
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.handler.IgnoreThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
@@ -49,13 +50,15 @@ class HomeScreenViewModel(
         )
     }.flow.cachedIn(viewModelScope)
 
-    private fun updateScreenLoading() {
+    @VisibleForTesting
+    internal fun updateScreenLoading() {
         _screenState.update {
             it.copy(screenLoadingState = ScreenLoadingState.Loading())
         }
     }
 
-    private fun updateScreenSuccess() {
+    @VisibleForTesting
+    internal fun updateScreenSuccess() {
         if (_screenState.value.screenLoadingState !is ScreenLoadingState.Failure) {
             _screenState.update {
                 it.copy(screenLoadingState = ScreenLoadingState.Success())
@@ -63,7 +66,8 @@ class HomeScreenViewModel(
         }
     }
 
-    private suspend fun fetchArticles(key: String?): Articles? {
+    @VisibleForTesting
+    internal suspend fun fetchArticles(key: String?): Articles? {
         return zennService.fetchArticles(
             keyword = _state.value.searchKeyword,
             nextPage = key

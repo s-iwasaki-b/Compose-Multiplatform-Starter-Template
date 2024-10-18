@@ -13,3 +13,15 @@ inline fun <Success> Result<Success>.handle(
         null
     }
 }
+
+inline fun <Success> Result<Success>.handle(
+    handler: (Throwable) -> Unit,
+    default: Success,
+    shouldCancelScope: CoroutineScope? = null,
+): Success {
+    return this.getOrElse {
+        handler(it)
+        shouldCancelScope?.cancel(it.message.orEmpty())
+        default
+    }
+}

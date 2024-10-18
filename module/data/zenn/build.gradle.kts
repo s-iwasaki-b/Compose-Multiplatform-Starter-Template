@@ -40,6 +40,7 @@ android {
     namespace = "$PACKAGE_NAME.data.zenn"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
         consumerProguardFiles("proguard-rules.pro")
     }
     compileOptions {

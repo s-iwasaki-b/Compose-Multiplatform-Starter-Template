@@ -44,6 +44,7 @@ android {
     sourceSets["main"].res.srcDirs("src/androidMain/res")
 
     defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
         consumerProguardFiles("proguard-rules.pro")
     }
     compileOptions {

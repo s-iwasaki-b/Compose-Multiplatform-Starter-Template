@@ -4,8 +4,8 @@ import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.cancellation.CancellationException
 
 class ResultHandler(
     val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -18,11 +18,10 @@ class ResultHandler(
             try {
                 val value = block()
                 Result.success(value)
-            } catch (e: CancellationException) {
-                throw e
             } catch (e: Throwable) {
                 // TODO: report error to your analytics
                 Napier.d { e.message.orEmpty() }
+                coroutineContext.ensureActive()
                 Result.failure(e)
             }
         }
@@ -39,8 +38,6 @@ class ResultHandler(
         return try {
             val value = block()
             Result.success(value)
-        } catch (e: CancellationException) {
-            throw e
         } catch (e: Throwable) {
             // TODO: report error to your analytics
             Napier.d { e.message.orEmpty() }

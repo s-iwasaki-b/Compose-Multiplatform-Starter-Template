@@ -18,8 +18,9 @@ class ResultHandler(
             try {
                 val value = block()
                 Result.success(value)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Throwable) {
-                (e as? CancellationException)?.let { throw it }
                 // TODO: report error to your analytics
                 Napier.d { e.message.orEmpty() }
                 Result.failure(e)
@@ -38,8 +39,9 @@ class ResultHandler(
         return try {
             val value = block()
             Result.success(value)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Throwable) {
-            (e as? CancellationException)?.let { throw it }
             // TODO: report error to your analytics
             Napier.d { e.message.orEmpty() }
             Result.failure(e)

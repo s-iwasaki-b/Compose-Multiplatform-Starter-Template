@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 class ResultHandler(
     val dispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -18,6 +19,7 @@ class ResultHandler(
                 val value = block()
                 Result.success(value)
             } catch (e: Throwable) {
+                (e as? CancellationException)?.let { throw it }
                 // TODO: report error to your analytics
                 Napier.d { e.message.orEmpty() }
                 Result.failure(e)
@@ -37,6 +39,7 @@ class ResultHandler(
             val value = block()
             Result.success(value)
         } catch (e: Throwable) {
+            (e as? CancellationException)?.let { throw it }
             // TODO: report error to your analytics
             Napier.d { e.message.orEmpty() }
             Result.failure(e)

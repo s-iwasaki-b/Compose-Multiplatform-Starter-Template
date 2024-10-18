@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 }
@@ -30,6 +31,7 @@ kotlin {
             api(compose.components.uiToolingPreview)
             api(libs.androidx.lifecycle.viewmodel.compose)
             api(libs.androidx.lifecycle.runtime.compose)
+            api(libs.androidx.navigation.compose)
 
             api(projects.module.base)
             api(libs.bundles.ui)

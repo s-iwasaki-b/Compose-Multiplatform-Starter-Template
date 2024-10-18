@@ -9,11 +9,15 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.koin.compose.KoinContext
-import org.starter.project.feature.home.HomeScreen
+import org.starter.project.navigation.AppNavHost
+import org.starter.project.navigation.AppRouter
+import org.starter.project.navigation.rememberAppRouter
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-fun Main() {
+fun Main(
+    appRouter: AppRouter = rememberAppRouter()
+) {
     KoinContext {
         SystemTheme {
             Box(
@@ -22,7 +26,7 @@ fun Main() {
                     .background(SystemTheme.colors.background)
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
-                HomeScreen()
+                AppNavHost(appRouter)
             }
         }
     }

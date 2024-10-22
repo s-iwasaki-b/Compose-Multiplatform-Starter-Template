@@ -6,7 +6,7 @@ import org.starter.project.ui.shared.state.ScreenState
 import org.starter.project.ui.shared.state.SnackBarState
 
 object SnackBarThrowableHandler {
-    inline operator fun invoke(state: MutableStateFlow<ScreenState>): (Throwable) -> Unit = { t ->
+    operator fun invoke(state: MutableStateFlow<ScreenState>): (Throwable) -> Unit = { t ->
         state.update {
             it.copy(
                 snackBarState = SnackBarState(t.message.orEmpty())

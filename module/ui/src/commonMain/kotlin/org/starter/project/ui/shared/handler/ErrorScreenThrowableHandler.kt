@@ -6,7 +6,7 @@ import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
 object ErrorScreenThrowableHandler {
-    inline operator fun invoke(state: MutableStateFlow<ScreenState>): (Throwable) -> Unit = { t ->
+    operator fun invoke(state: MutableStateFlow<ScreenState>): (Throwable) -> Unit = { t ->
         state.update {
             it.copy(
                 screenLoadingState = ScreenLoadingState.Failure(

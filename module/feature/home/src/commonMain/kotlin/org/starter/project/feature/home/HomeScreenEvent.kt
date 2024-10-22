@@ -12,7 +12,7 @@ internal sealed interface HomeScreenEvent : ScreenEvent {
 }
 
 internal object HomeScreenEventHandler {
-    inline operator fun invoke(
+    operator fun invoke(
         event: ScreenEvent,
         viewModel: HomeScreenViewModel,
         articlesPagingItems: LazyPagingItems<Article>

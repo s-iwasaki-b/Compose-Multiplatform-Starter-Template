@@ -59,3 +59,7 @@ This repository includes a simple [Zenn](https://zenn.dev/) viewer implemented a
 | Pixel 3a - Android 12 | iPhone XS - iOS 18.0 |
 |--|--|
 | <video src="https://github.com/user-attachments/assets/e9bdc1c5-458a-4e9d-8af7-780f556cbd23"> | <video src="https://github.com/user-attachments/assets/4719859c-a21c-4bfd-a246-9b3b20c4ddb3"> |
+
+# More Detail
+
+cf. https://zenn.dev/dely_jp/articles/ce01725bde5ed4

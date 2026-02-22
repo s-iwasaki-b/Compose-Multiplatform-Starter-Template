@@ -1,6 +1,6 @@
 package org.starter.project.feature.home
 
-import app.cash.paging.compose.LazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.shared.event.ScreenEvent
 

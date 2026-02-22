@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import app.cash.paging.compose.LazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
 
 internal fun LazyListScope.articleList(

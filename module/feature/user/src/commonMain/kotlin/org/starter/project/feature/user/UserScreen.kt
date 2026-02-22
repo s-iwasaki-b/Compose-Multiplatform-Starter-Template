@@ -67,8 +67,8 @@ private fun UserScreenContent(
     SystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
-        onTapErrorActionButton = {
-            dispatch(UserScreenEvent.OnTapErrorScreenAction)
+        onClickErrorActionButton = {
+            dispatch(UserScreenEvent.OnClickErrorScreenAction)
         },
         topBar = {
             TopAppBar(
@@ -81,7 +81,7 @@ private fun UserScreenContent(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { dispatch(UserScreenEvent.OnTapBack) }) {
+                    IconButton(onClick = { dispatch(UserScreenEvent.OnClickBack) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",

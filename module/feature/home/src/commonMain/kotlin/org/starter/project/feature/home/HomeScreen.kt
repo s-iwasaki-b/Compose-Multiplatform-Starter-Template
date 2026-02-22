@@ -80,8 +80,8 @@ private fun HomeScreenContent(
     SystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
-        onTapErrorActionButton = {
-            dispatch(HomeScreenEvent.OnTapErrorScreenAction)
+        onClickErrorActionButton = {
+            dispatch(HomeScreenEvent.OnClickErrorScreenAction)
         }
     ) { paddingValues ->
         LazyColumn(
@@ -98,13 +98,13 @@ private fun HomeScreenContent(
                         .padding(vertical = 16.dp),
                     value = state.searchKeyword,
                     onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },
-                    onTapClear = { dispatch(HomeScreenEvent.OnTapClearSearchKeyword) },
-                    onTapAction = { dispatch(HomeScreenEvent.OnTapActionSearchKeyword) }
+                    onClickClear = { dispatch(HomeScreenEvent.OnClickClearSearchKeyword) },
+                    onClickAction = { dispatch(HomeScreenEvent.OnClickActionSearchKeyword) }
                 )
             }
             articleList(
                 articlesPagingItems = articlesPagingItems,
-                onTapUser = { dispatch(HomeScreenEvent.OnTapUser(it)) },
+                onClickUser = { dispatch(HomeScreenEvent.OnClickUser(it)) },
             )
         }
     }

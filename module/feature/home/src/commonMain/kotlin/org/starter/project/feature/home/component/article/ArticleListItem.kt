@@ -31,7 +31,7 @@ import org.starter.project.ui.design.system.theme.SystemTheme
 @Composable
 internal fun ArticleListItem(
     article: Article,
-    onTapUser: (String) -> Unit,
+    onClickUser: (String) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -78,7 +78,7 @@ internal fun ArticleListItem(
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Row(
-                    modifier = Modifier.clickable { onTapUser(article.user.username) },
+                    modifier = Modifier.clickable { onClickUser(article.user.username) },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(

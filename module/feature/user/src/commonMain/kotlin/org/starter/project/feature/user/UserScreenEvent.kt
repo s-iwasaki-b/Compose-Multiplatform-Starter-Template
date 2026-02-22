@@ -5,8 +5,8 @@ import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.shared.event.ScreenEvent
 
 internal sealed interface UserScreenEvent : ScreenEvent {
-    data object OnTapErrorScreenAction : UserScreenEvent
-    data object OnTapBack : UserScreenEvent
+    data object OnClickErrorScreenAction : UserScreenEvent
+    data object OnClickBack : UserScreenEvent
 }
 
 internal object UserScreenEventHandler {
@@ -16,10 +16,10 @@ internal object UserScreenEventHandler {
         onNavigateBack: () -> Unit,
     ) {
         when (event) {
-            UserScreenEvent.OnTapErrorScreenAction -> {
+            UserScreenEvent.OnClickErrorScreenAction -> {
                 articlesPagingItems.refresh()
             }
-            UserScreenEvent.OnTapBack -> {
+            UserScreenEvent.OnClickBack -> {
                 onNavigateBack()
             }
             else -> {

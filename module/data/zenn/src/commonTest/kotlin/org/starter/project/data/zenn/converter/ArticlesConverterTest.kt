@@ -2,18 +2,17 @@ package org.starter.project.data.zenn.converter
 
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.base.data.model.zenn.Articles
-import org.starter.project.base.data.model.zenn.User
 import org.starter.project.base.error.ConversionError.ResponseNotNullValidation
 import org.starter.project.data.zenn.datasource.api.response.ArticleResponse
 import org.starter.project.data.zenn.datasource.api.response.ArticlesResponse
-import org.starter.project.data.zenn.datasource.api.response.UserResponse
+import org.starter.project.data.zenn.datasource.api.response.ArticleUserResponse
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class ArticlesConverterTest {
     private val subject = ArticlesConverter
-    private val userResponse = UserResponse(
+    private val userResponse = ArticleUserResponse(
         id = 0,
         username = "username",
         name = "name",
@@ -127,7 +126,7 @@ class ArticlesConverterTest {
         val actual = subject.createUser(userResponse)
 
         // assert
-        val expected = User(
+        val expected = Article.User(
             id = 0,
             username = "username",
             name = "name",

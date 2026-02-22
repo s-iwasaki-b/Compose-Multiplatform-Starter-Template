@@ -9,13 +9,15 @@ internal sealed interface HomeScreenEvent : ScreenEvent {
     data class OnChangeSearchKeyword(val keyword: String) : HomeScreenEvent
     data object OnTapClearSearchKeyword : HomeScreenEvent
     data object OnTapActionSearchKeyword : HomeScreenEvent
+    data class OnTapUser(val username: String) : HomeScreenEvent
 }
 
 internal object HomeScreenEventHandler {
     operator fun invoke(
         event: ScreenEvent,
         viewModel: HomeScreenViewModel,
-        articlesPagingItems: LazyPagingItems<Article>
+        articlesPagingItems: LazyPagingItems<Article>,
+        onNavigateToUser: (String) -> Unit,
     ) {
         when (event) {
             HomeScreenEvent.OnTapErrorScreenAction -> {
@@ -30,6 +32,9 @@ internal object HomeScreenEventHandler {
             }
             HomeScreenEvent.OnTapActionSearchKeyword -> {
                 articlesPagingItems.refresh()
+            }
+            is HomeScreenEvent.OnTapUser -> {
+                onNavigateToUser(event.username)
             }
             else -> {
                 /* no-op */

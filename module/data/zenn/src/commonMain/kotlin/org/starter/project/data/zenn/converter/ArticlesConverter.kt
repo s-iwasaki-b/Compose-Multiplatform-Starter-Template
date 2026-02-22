@@ -3,12 +3,11 @@ package org.starter.project.data.zenn.converter
 import androidx.annotation.VisibleForTesting
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.base.data.model.zenn.Articles
-import org.starter.project.base.data.model.zenn.User
 import org.starter.project.base.error.ConversionError
 import org.starter.project.base.extension.validateNotNull
 import org.starter.project.data.zenn.datasource.api.response.ArticleResponse
 import org.starter.project.data.zenn.datasource.api.response.ArticlesResponse
-import org.starter.project.data.zenn.datasource.api.response.UserResponse
+import org.starter.project.data.zenn.datasource.api.response.ArticleUserResponse
 
 object ArticlesConverter {
     operator fun invoke(response: ArticlesResponse): Articles {
@@ -39,8 +38,8 @@ object ArticlesConverter {
     }
 
     @VisibleForTesting
-    internal fun createUser(response: UserResponse): User {
-        return User(
+    internal fun createUser(response: ArticleUserResponse): Article.User {
+        return Article.User(
             id = response.id.validateNotNull("id"),
             username = response.username.validateNotNull("username"),
             name = response.name.validateNotNull("name"),

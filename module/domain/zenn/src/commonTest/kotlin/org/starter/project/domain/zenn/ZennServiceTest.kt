@@ -11,14 +11,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.base.data.model.zenn.Articles
-import org.starter.project.base.data.model.zenn.User
 import org.starter.project.data.repository.ZennRepository
 import org.starter.project.domain.service.ResultHandler
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ZennServiceTest {
-    private val mockUser = User(4, "username", "name", "avatar_small_url")
+    private val mockUser = Article.User(4, "username", "name", "avatar_small_url")
     private val mockArticle = Article(1, "emoji", "title", 2, 3, "published_at", mockUser)
     private val mockArticles = Articles(listOf(mockArticle), "next_page")
     private val mockZennRepository = mock<ZennRepository>(MockMode.autofill)

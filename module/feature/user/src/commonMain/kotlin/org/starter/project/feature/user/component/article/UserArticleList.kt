@@ -1,4 +1,4 @@
-package org.starter.project.feature.home.component.article
+package org.starter.project.feature.user.component.article
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -8,16 +8,15 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
 
-internal fun LazyListScope.articleList(
+internal fun LazyListScope.userArticleList(
     articlesPagingItems: LazyPagingItems<Article>,
-    onTapUser: (String) -> Unit,
 ) {
     items(
         count = articlesPagingItems.itemCount,
-        key = { index -> "article_list_items_$index" }
+        key = { index -> "user_article_list_items_$index" }
     ) { index ->
         val article = articlesPagingItems[index] ?: return@items
-        ArticleListItem(article = article, onTapUser = onTapUser)
+        UserArticleListItem(article = article)
         Spacer(modifier = Modifier.height(16.dp))
     }
 }

@@ -1,23 +1,23 @@
 [versions]
-agp = "8.2.2"
-android-compileSdk = "34"
+agp = "9.0.1"
+android-compileSdk = "36"
 android-minSdk = "29"
-android-targetSdk = "34"
-androidx-activity-compose = "1.9.2"
-androidx-lifecycle = "2.8.2"
-androidx-navigation = "2.8.0-alpha10"
-compose-plugin = "1.7.0"
-kotlin = "2.0.20"
-devtools = "2.0.20-1.0.24"
-kotlinx-coroutines = "1.9.0"
-kotlinx-datetime = "0.6.1"
-koin = "4.0.0"
-multiplatform-settings = "1.2.0"
-ktor = "2.3.12"
-ktorfit = "2.1.0"
+android-targetSdk = "36"
+androidx-activity-compose = "1.12.4"
+androidx-lifecycle = "2.9.6"
+androidx-navigation = "2.9.2"
+compose-plugin = "1.10.1"
+kotlin = "2.3.10"
+devtools = "2.3.2"
+kotlinx-coroutines = "1.10.2"
+kotlinx-datetime = "0.7.1"
+koin = "4.1.1"
+multiplatform-settings = "1.3.0"
+ktor = "3.4.0"
+ktorfit = "2.7.2"
 paging-compose-common = "3.3.0-alpha02-0.5.1"
-coil = "3.0.0-rc01"
-mokkery = "2.4.0"
+coil = "3.3.0"
+mokkery = "3.2.0"
 napier = "2.7.1"
 
 [libraries]
@@ -43,7 +43,7 @@ ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx
 ktorfit = { module = "de.jensklingenberg.ktorfit:ktorfit-lib-light", version.ref = "ktorfit" }
 paging-compose-common = { module = "app.cash.paging:paging-compose-common", version.ref = "paging-compose-common" }
 coil = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-network = { module = "io.coil-kt.coil3:coil-network-ktor2", version.ref = "coil" }
+coil-network = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil" }
 napier = { module = "io.github.aakira:napier", version.ref = "napier" }
 
 [plugins]

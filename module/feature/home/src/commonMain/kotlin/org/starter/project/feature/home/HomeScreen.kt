@@ -19,7 +19,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import io.github.aakira.napier.Napier
 import org.starter.project.base.data.model.zenn.Article
-import org.starter.project.feature.home.component.article.articleList
+import org.starter.project.ui.shared.component.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.search.SystemSearchBar
 import org.starter.project.ui.design.system.theme.SystemTheme

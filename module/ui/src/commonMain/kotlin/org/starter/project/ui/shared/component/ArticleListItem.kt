@@ -1,4 +1,4 @@
-package org.starter.project.feature.home.component.article
+package org.starter.project.ui.shared.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,9 +29,9 @@ import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-internal fun ArticleListItem(
+fun ArticleListItem(
     article: Article,
-    onClickUser: (String) -> Unit,
+    onClickUser: ((String) -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -76,24 +76,26 @@ internal fun ArticleListItem(
                     color = Color.DarkGray,
                     text = article.likedCount.toString()
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Row(
-                    modifier = Modifier.clickable { onClickUser(article.user.username) },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = article.user.avatarSmallUrl,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        style = SystemTheme.typography.caption,
-                        color = Color.DarkGray,
-                        text = article.user.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                if (onClickUser != null) {
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Row(
+                        modifier = Modifier.clickable { onClickUser(article.user.username) },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AsyncImage(
+                            model = article.user.avatarSmallUrl,
+                            contentDescription = null,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            style = SystemTheme.typography.caption,
+                            color = Color.DarkGray,
+                            text = article.user.name,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-package org.starter.project.feature.home.component.article
+package org.starter.project.ui.shared.component
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -8,9 +8,9 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
 
-internal fun LazyListScope.articleList(
+fun LazyListScope.articleList(
     articlesPagingItems: LazyPagingItems<Article>,
-    onClickUser: (String) -> Unit,
+    onClickUser: ((String) -> Unit)? = null,
 ) {
     items(
         count = articlesPagingItems.itemCount,

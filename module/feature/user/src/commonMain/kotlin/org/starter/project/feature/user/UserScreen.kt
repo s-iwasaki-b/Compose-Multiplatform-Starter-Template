@@ -31,7 +31,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImage
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.base.data.model.zenn.User
-import org.starter.project.ui.shared.component.articleList
+import org.starter.project.ui.shared.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.theme.SystemTheme
 import org.starter.project.ui.route.AppRouter

@@ -1,4 +1,4 @@
-package org.starter.project.ui.shared.component
+package org.starter.project.ui.shared.component.article
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

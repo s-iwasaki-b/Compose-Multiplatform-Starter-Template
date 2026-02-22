@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import org.starter.project.base.data.model.zenn.Articles
 import org.starter.project.base.extension.handle
 import org.starter.project.domain.service.ZennService
-import org.starter.project.feature.user.component.paging.UserArticlesPagingSource
+import org.starter.project.ui.shared.component.article.ArticlesPagingSource
 import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
@@ -43,9 +43,9 @@ class UserScreenViewModel(
     )
 
     val articlesPagingFlow = Pager(
-        PagingConfig(UserArticlesPagingSource.PAGE_SIZE)
+        PagingConfig(ArticlesPagingSource.PAGE_SIZE)
     ) {
-        UserArticlesPagingSource(
+        ArticlesPagingSource(
             onRefresh = ::updateScreenLoading,
             onLoadedFirstPage = ::updateScreenSuccess,
             fetcher = ::fetchUserArticles

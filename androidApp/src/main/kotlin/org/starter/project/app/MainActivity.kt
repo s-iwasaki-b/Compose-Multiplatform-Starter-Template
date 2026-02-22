@@ -26,12 +26,14 @@ class MainActivity : ComponentActivity() {
             Main()
         }
 
+        // アプリ起動前のDeepLink発火によるintentを処理する
         handleDeepLinkIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        // アプリ起動中のDeepLink発火によるintentを処理する
         handleDeepLinkIntent(intent)
     }
 

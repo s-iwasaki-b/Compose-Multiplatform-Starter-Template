@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.Scaffold
@@ -60,7 +59,6 @@ fun SystemScaffold(
                 Box(
                     modifier = Modifier
                         .background(color = backgroundColor)
-                        .statusBarsPadding()
                 ) {
                     topBar()
                 }

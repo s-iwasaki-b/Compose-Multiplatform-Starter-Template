@@ -34,28 +34,27 @@ import org.starter.project.base.data.model.zenn.User
 import org.starter.project.feature.user.component.article.userArticleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.theme.SystemTheme
-import org.starter.project.ui.route.Router
+import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
 fun UserScreen(
     viewModel: UserScreenViewModel,
-    appRouter: Router,
+    appRouter: AppRouter,
 ) {
     val state by viewModel.state.collectAsState()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
 
     UserScreenContent(
         state = state,
-        articlesPagingItems = articlesPagingItems,
-        dispatch = { event ->
-            UserScreenEventHandler(
-                event = event,
-                articlesPagingItems = articlesPagingItems,
-                onNavigateBack = { appRouter.popBackStack() },
-            )
-        }
-    )
+        articlesPagingItems = articlesPagingItems
+    ) { event ->
+        UserScreenEventHandler(
+            event = event,
+            appRouter = appRouter,
+            articlesPagingItems = articlesPagingItems
+        )
+    }
 }
 
 @Composable

@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import org.koin.compose.KoinContext
 import org.starter.project.navigation.AppNavHost
-import org.starter.project.navigation.AppRouter
+import org.starter.project.navigation.AppRouterImpl
 import org.starter.project.navigation.rememberAppRouter
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-fun Main(
-    appRouter: AppRouter = rememberAppRouter()
+internal fun Main(
+    appRouter: AppRouterImpl = rememberAppRouter()
 ) {
     KoinContext {
         SystemTheme {

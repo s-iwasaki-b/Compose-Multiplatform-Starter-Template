@@ -4,13 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import org.starter.project.ui.route.Route
-import org.starter.project.ui.route.Router
+import org.starter.project.ui.route.AppRoute
+import org.starter.project.ui.route.AppRouter
 
-class AppRouter(
+internal class AppRouterImpl(
     internal val navController: NavHostController,
-) : Router {
-    override fun navigate(route: Route) {
+) : AppRouter {
+    override fun navigate(route: AppRoute) {
         navController.navigate(route)
     }
 
@@ -20,8 +20,8 @@ class AppRouter(
 }
 
 @Composable
-fun rememberAppRouter(
+internal fun rememberAppRouter(
     navController: NavHostController = rememberNavController()
 ) = remember(navController) {
-    AppRouter(navController)
+    AppRouterImpl(navController)
 }

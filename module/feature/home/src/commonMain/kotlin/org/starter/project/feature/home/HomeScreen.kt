@@ -24,14 +24,13 @@ import org.starter.project.feature.home.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.search.SystemSearchBar
 import org.starter.project.ui.design.system.theme.SystemTheme
-import org.starter.project.ui.route.Route
-import org.starter.project.ui.route.Router
+import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel(),
-    appRouter: Router
+    appRouter: AppRouter
 ) {
     val state by viewModel.state.collectAsState()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
@@ -49,17 +48,14 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         articlesPagingItems = articlesPagingItems,
-        dispatch = { event ->
-            HomeScreenEventHandler(
-                event = event,
-                viewModel = viewModel,
-                articlesPagingItems = articlesPagingItems,
-                onNavigateToUser = { username ->
-                    appRouter.navigate(Route.User(username))
-                },
-            )
-        }
-    )
+    ) { event ->
+        HomeScreenEventHandler(
+            event = event,
+            appRouter = appRouter,
+            viewModel = viewModel,
+            articlesPagingItems = articlesPagingItems
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

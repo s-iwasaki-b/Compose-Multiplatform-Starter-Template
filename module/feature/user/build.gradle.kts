@@ -23,8 +23,15 @@ kotlin {
         commonMain.dependencies {
             api(projects.module.ui)
             implementation(projects.module.domain.service)
+            implementation(compose.components.resources)
         }
     }
+}
+
+compose.resources {
+    publicResClass = false
+    packageOfResClass = "$PACKAGE_NAME.feature.user.resources"
+    generateResClass = auto
 }
 
 android {

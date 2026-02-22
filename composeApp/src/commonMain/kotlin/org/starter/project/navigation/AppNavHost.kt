@@ -20,13 +20,11 @@ internal fun AppNavHost(
 ) {
     NavHost(appRouter.navController, startDestination = AppRoute.Home) {
         composable<AppRoute.Home> {
-            HomeScreen(appRouter = appRouter)
+            HomeScreen(viewModel = koinViewModel(), appRouter = appRouter)
         }
         composable<AppRoute.User> { backStackEntry ->
             val route = backStackEntry.toRoute<AppRoute.User>()
-            val viewModel = koinViewModel<UserScreenViewModel> {
-                parametersOf(route.username)
-            }
+            val viewModel = koinViewModel<UserScreenViewModel> { parametersOf(route.navArgs) }
             UserScreen(viewModel = viewModel, appRouter = appRouter)
         }
     }

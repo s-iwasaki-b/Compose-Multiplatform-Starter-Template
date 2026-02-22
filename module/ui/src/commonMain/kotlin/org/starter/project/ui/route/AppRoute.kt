@@ -7,7 +7,12 @@ sealed class AppRoute {
     data object Home : AppRoute()
 
     @Serializable
-    data class User(val username: String) : AppRoute()
+    data class User(val username: String) : AppRoute() {
+        @Serializable
+        data class NavArgs(val username: String)
+        val navArgs: NavArgs
+            get() = NavArgs(username)
+    }
 }
 
 interface AppRouter {

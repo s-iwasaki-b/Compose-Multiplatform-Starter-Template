@@ -24,6 +24,7 @@ import org.starter.project.feature.home.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.search.SystemSearchBar
 import org.starter.project.ui.design.system.theme.SystemTheme
+import org.starter.project.ui.route.Route
 import org.starter.project.ui.route.Router
 import org.starter.project.ui.shared.event.ScreenEvent
 
@@ -52,7 +53,10 @@ fun HomeScreen(
             HomeScreenEventHandler(
                 event = event,
                 viewModel = viewModel,
-                articlesPagingItems = articlesPagingItems
+                articlesPagingItems = articlesPagingItems,
+                onNavigateToUser = { username ->
+                    appRouter.navigate(Route.User(username))
+                },
             )
         }
     )
@@ -98,7 +102,10 @@ private fun HomeScreenContent(
                     onTapAction = { dispatch(HomeScreenEvent.OnTapActionSearchKeyword) }
                 )
             }
-            articleList(articlesPagingItems)
+            articleList(
+                articlesPagingItems = articlesPagingItems,
+                onTapUser = { dispatch(HomeScreenEvent.OnTapUser(it)) },
+            )
         }
     }
 }

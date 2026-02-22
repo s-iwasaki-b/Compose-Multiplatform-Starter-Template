@@ -1,6 +1,7 @@
 package org.starter.project.di
 
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -17,6 +18,7 @@ import org.starter.project.domain.service.ResultHandler
 import org.starter.project.domain.service.ZennService
 import org.starter.project.domain.zenn.ZennServiceImpl
 import org.starter.project.feature.home.HomeScreenViewModel
+import org.starter.project.feature.user.UserScreenViewModel
 
 expect val platformModule: org.koin.core.module.Module
 
@@ -45,6 +47,7 @@ fun startKoin(platformDeclaration: KoinAppDeclaration? = null) {
 
         val appModule = module {
             viewModelOf(::HomeScreenViewModel)
+            viewModel { (username: String) -> UserScreenViewModel(get(), username) }
         }
 
         modules(

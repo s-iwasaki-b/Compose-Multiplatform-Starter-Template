@@ -1,0 +1,92 @@
+package org.starter.project.feature.user
+
+import androidx.annotation.VisibleForTesting
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import org.starter.project.base.data.model.zenn.Articles
+import org.starter.project.base.extension.handle
+import org.starter.project.domain.service.ZennService
+import org.starter.project.feature.user.component.paging.UserArticlesPagingSource
+import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
+import org.starter.project.ui.shared.state.ScreenLoadingState
+import org.starter.project.ui.shared.state.ScreenState
+
+class UserScreenViewModel(
+    private val zennService: ZennService,
+    private val username: String,
+) : ViewModel() {
+    private val _screenState = MutableStateFlow(
+        ScreenState(ScreenLoadingState.Initial(true), null)
+    )
+    private val _state = MutableStateFlow(
+        UserScreenState(screenState = _screenState.value)
+    )
+    internal val state = combine(
+        _screenState,
+        _state
+    ) { screenState, state ->
+        state.copy(screenState = screenState)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        _state.value
+    )
+
+    val articlesPagingFlow = Pager(
+        PagingConfig(UserArticlesPagingSource.PAGE_SIZE)
+    ) {
+        UserArticlesPagingSource(
+            onRefresh = ::updateScreenLoading,
+            onLoadedFirstPage = ::updateScreenSuccess,
+            fetcher = ::fetchUserArticles
+        )
+    }.flow.cachedIn(viewModelScope)
+
+    init {
+        fetchUser()
+    }
+
+    @VisibleForTesting
+    internal fun fetchUser() {
+        viewModelScope.launch {
+            zennService.fetchUser(username).handle(
+                ErrorScreenThrowableHandler(_screenState)
+            )?.let { user ->
+                _state.update { it.copy(user = user) }
+            }
+        }
+    }
+
+    @VisibleForTesting
+    internal fun updateScreenLoading() {
+        _screenState.update {
+            it.copy(screenLoadingState = ScreenLoadingState.Loading())
+        }
+    }
+
+    @VisibleForTesting
+    internal fun updateScreenSuccess() {
+        if (_screenState.value.screenLoadingState !is ScreenLoadingState.Failure) {
+            _screenState.update {
+                it.copy(screenLoadingState = ScreenLoadingState.Success())
+            }
+        }
+    }
+
+    @VisibleForTesting
+    internal suspend fun fetchUserArticles(key: String?): Articles? {
+        return zennService.fetchUserArticles(
+            username = username,
+            nextPage = key
+        ).handle(ErrorScreenThrowableHandler(_screenState))
+    }
+}

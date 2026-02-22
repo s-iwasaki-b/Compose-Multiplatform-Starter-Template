@@ -44,13 +44,13 @@ data class ArticleResponse(
     @SerialName("path")
     val path: String?,
     @SerialName("user")
-    val user: UserResponse?,
+    val user: ArticleUserResponse?,
     @SerialName("publication")
-    val publication: PublicationResponse?
+    val publication: ArticlePublicationResponse?
 )
 
 @Serializable
-data class UserResponse(
+data class ArticleUserResponse(
     @SerialName("id")
     val id: Int?,
     @SerialName("username")
@@ -62,7 +62,7 @@ data class UserResponse(
 )
 
 @Serializable
-data class PublicationResponse(
+data class ArticlePublicationResponse(
     @SerialName("id")
     val id: Int?,
     @SerialName("name")

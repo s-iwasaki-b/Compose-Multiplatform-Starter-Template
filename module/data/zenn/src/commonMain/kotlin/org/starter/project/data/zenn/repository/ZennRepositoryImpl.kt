@@ -1,8 +1,10 @@
 package org.starter.project.data.zenn.repository
 
 import org.starter.project.base.data.model.zenn.Articles
+import org.starter.project.base.data.model.zenn.User
 import org.starter.project.data.repository.ZennRepository
 import org.starter.project.data.zenn.converter.ArticlesConverter
+import org.starter.project.data.zenn.converter.UserConverter
 import org.starter.project.data.zenn.datasource.api.ZennApi
 import org.starter.project.data.zenn.datasource.preferences.ZennPreferences
 
@@ -17,6 +19,10 @@ class ZennRepositoryImpl(
         page: String?
     ): Articles {
         return ArticlesConverter(zennApi.fetchArticles(userName, publicationName, order, page))
+    }
+
+    override suspend fun fetchUser(username: String): User {
+        return UserConverter(zennApi.fetchUser(username))
     }
 
     override fun getLastKeyword(): String? = zennPreferences.lastKeyword

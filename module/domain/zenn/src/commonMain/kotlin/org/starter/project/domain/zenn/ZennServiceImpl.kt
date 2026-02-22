@@ -34,4 +34,15 @@ open class ZennServiceImpl(
     override fun getLastKeyword() = resultHandler.immediate {
         zennRepository.getLastKeyword()
     }
+
+    override suspend fun fetchUser(username: String) = resultHandler.async {
+        zennRepository.fetchUser(username)
+    }
+
+    override suspend fun fetchUserArticles(
+        username: String,
+        nextPage: String?
+    ) = resultHandler.async {
+        zennRepository.fetchArticles(userName = username, page = nextPage)
+    }
 }

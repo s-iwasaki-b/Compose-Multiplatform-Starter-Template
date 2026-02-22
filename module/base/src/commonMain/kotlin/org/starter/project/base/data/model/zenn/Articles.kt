@@ -17,12 +17,12 @@ data class Article(
     val likedCount: Int,
     val publishedAt: String,
     val user: User,
-)
-
-@Immutable
-data class User(
-    val id: Int,
-    val username: String,
-    val name: String,
-    val avatarSmallUrl: String
-)
+) {
+    @Immutable
+    data class User(
+        val id: Int,
+        val username: String,
+        val name: String,
+        val avatarSmallUrl: String
+    )
+}

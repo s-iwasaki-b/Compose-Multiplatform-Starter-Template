@@ -1,9 +1,8 @@
-package org.starter.project.feature.home.component.article
+package org.starter.project.feature.user.component.article
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,14 +23,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-internal fun ArticleListItem(
-    article: Article,
-    onTapUser: (String) -> Unit,
+internal fun UserArticleListItem(
+    article: Article
 ) {
     Row(
         modifier = Modifier
@@ -76,25 +73,6 @@ internal fun ArticleListItem(
                     color = Color.DarkGray,
                     text = article.likedCount.toString()
                 )
-                Spacer(modifier = Modifier.width(12.dp))
-                Row(
-                    modifier = Modifier.clickable { onTapUser(article.user.username) },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = article.user.avatarSmallUrl,
-                        contentDescription = null,
-                        modifier = Modifier.size(12.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        style = SystemTheme.typography.caption,
-                        color = Color.DarkGray,
-                        text = article.user.name,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
             }
         }
     }

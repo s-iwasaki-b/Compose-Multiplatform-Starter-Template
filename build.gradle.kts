@@ -1,6 +1,4 @@
 plugins {
-    // this is necessary to avoid the plugins to be loaded multiple times
-    // in each subproject's classloader
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
@@ -39,10 +37,10 @@ tasks.register("changeProjectName") {
 }
 
 tasks.register("changePackageName") {
-    val oldPackageName = PACKAGE_NAME
+    val oldPackageName = project.property("packageName").toString()
     val newPackageName: String? = project.findProperty("newPackageName") as String?
     val sourceSets = listOf("androidMain", "commonMain", "iosMain", "commonTest")
-    val fileExtensions = listOf("kt", "xml", "xcconfig")
+    val fileExtensions = listOf("kt", "xml", "xcconfig", "properties")
 
     doLast {
         if (newPackageName.isNullOrEmpty()) {

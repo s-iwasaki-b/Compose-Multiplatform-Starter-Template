@@ -9,9 +9,20 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+val packageName: String by project
+
+fun allSubProjects(rootDir: File, action: (String) -> Unit) {
+    rootDir.resolve("module").walk().maxDepth(3).filter {
+        it.isDirectory && it.resolve("build.gradle.kts").exists()
+    }.forEach {
+        val path = it.relativeTo(rootDir).path.replace(File.separator, ":")
+        action(path)
+    }
+}
+
 kotlin {
     androidLibrary {
-        namespace = PACKAGE_NAME
+        namespace = packageName
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 

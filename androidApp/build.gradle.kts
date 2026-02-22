@@ -4,11 +4,13 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+val packageName: String by project
+
 android {
-    namespace = "$PACKAGE_NAME.app"
+    namespace = "$packageName.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
-        applicationId = PACKAGE_NAME
+        applicationId = packageName
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

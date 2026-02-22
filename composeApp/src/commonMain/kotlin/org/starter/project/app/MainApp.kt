@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import org.koin.compose.KoinContext
 import org.starter.project.navigation.AppNavHost
 import org.starter.project.navigation.AppRouter
+import org.starter.project.navigation.DeepLinkHandler
 import org.starter.project.navigation.rememberAppRouter
 import org.starter.project.ui.design.system.theme.SystemTheme
 
@@ -27,6 +31,14 @@ fun Main(
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
                 AppNavHost(appRouter)
+
+                val pendingDeepLink by DeepLinkHandler.pendingDeepLink.collectAsState()
+                LaunchedEffect(pendingDeepLink) {
+                    pendingDeepLink?.let { uri ->
+                        appRouter.handleDeepLink(uri)
+                        DeepLinkHandler.consumeDeepLink()
+                    }
+                }
             }
         }
     }

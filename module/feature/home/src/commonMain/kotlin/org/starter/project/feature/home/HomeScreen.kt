@@ -31,16 +31,26 @@ import org.starter.project.ui.shared.event.ScreenEvent
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel = koinViewModel(),
-    appRouter: Router
+    appRouter: Router,
+    deepLinkKeyword: String? = null
 ) {
     val state by viewModel.state.collectAsState()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
+
+    LaunchedEffect(deepLinkKeyword) {
+        if (deepLinkKeyword != null) {
+            viewModel.updateSearchKeyword(deepLinkKeyword)
+            articlesPagingItems.refresh()
+        }
+    }
 
     // This is an example of lifecycle event listener
     // cf. https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-lifecycle.html#mapping-android-lifecycle-to-other-platforms
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
         Napier.d { "HomeScreen.onStart" }
-        viewModel.initSearchKeyword()
+        if (deepLinkKeyword == null) {
+            viewModel.initSearchKeyword()
+        }
     }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { Napier.d { "HomeScreen.onResume" } }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { Napier.d { "HomeScreen.onPause" } }

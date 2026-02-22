@@ -8,6 +8,9 @@ struct iOSApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onOpenURL { url in
+                    DeepLinkHandler.shared.onDeepLinkReceived(uri: url.absoluteString)
+                }
         }
     }
 }

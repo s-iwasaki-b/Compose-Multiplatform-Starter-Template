@@ -1,5 +1,6 @@
 package org.starter.project.app
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -23,5 +24,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             Main()
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
     }
 }

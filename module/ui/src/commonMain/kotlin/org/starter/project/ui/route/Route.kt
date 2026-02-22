@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 sealed class Route {
     @Serializable
-    data object Home : Route()
+    data class Home(val keyword: String? = null) : Route()
 
     @Serializable
     data class User(val username: String) : Route()

@@ -18,10 +18,6 @@ kotlin {
     }
 }
 
-val packageName: String by project
-
 compose.resources {
     publicResClass = false
-    packageOfResClass = "$packageName.feature.user.resources"
-    generateResClass = auto
 }

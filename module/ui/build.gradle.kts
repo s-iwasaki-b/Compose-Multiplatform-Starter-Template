@@ -29,10 +29,6 @@ kotlin {
     }
 }
 
-val packageName: String by project
-
 compose.resources {
     publicResClass = true
-    packageOfResClass = "$packageName.ui.resources"
-    generateResClass = auto
 }

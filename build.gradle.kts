@@ -1,4 +1,5 @@
 plugins {
+    id("project")
     alias(libs.plugins.androidApplication) apply false
     alias(libs.plugins.androidLibrary) apply false
     alias(libs.plugins.androidKotlinMultiplatformLibrary) apply false
@@ -37,10 +38,10 @@ tasks.register("changeProjectName") {
 }
 
 tasks.register("changePackageName") {
-    val oldPackageName = project.property("packageName").toString()
+    val oldPackageName = PACKAGE_NAME
     val newPackageName: String? = project.findProperty("newPackageName") as String?
     val sourceSets = listOf("androidMain", "commonMain", "iosMain", "commonTest")
-    val fileExtensions = listOf("kt", "xml", "xcconfig", "properties")
+    val fileExtensions = listOf("kt", "xml", "xcconfig")
 
     doLast {
         if (newPackageName.isNullOrEmpty()) {

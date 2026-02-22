@@ -1,7 +1,6 @@
 package org.starter.project.di
 
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
@@ -47,7 +46,7 @@ fun startKoin(platformDeclaration: KoinAppDeclaration? = null) {
 
         val appModule = module {
             viewModelOf(::HomeScreenViewModel)
-            viewModel { (username: String) -> UserScreenViewModel(get(), username) }
+            viewModelOf(::UserScreenViewModel)
         }
 
         modules(

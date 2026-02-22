@@ -37,7 +37,7 @@ fun SystemScaffold(
     modifier: Modifier = Modifier,
     screenState: ScreenState,
     backgroundColor: Color = SystemTheme.colors.background,
-    onTapErrorActionButton: (() -> Unit)? = null,
+    onClickErrorActionButton: (() -> Unit)? = null,
     topBar: @Composable (() -> Unit)? = null,
     bottomBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
@@ -78,7 +78,7 @@ fun SystemScaffold(
                 title = stringResource(Res.string.loading_failure_default_message),
                 message = screenState.screenLoadingState.throwable.message,
                 actionLabel = stringResource(Res.string.loading_failure_default_action_label),
-                onTapActionButton = onTapErrorActionButton
+                onClickActionButton = onClickErrorActionButton
             )
         } else {
             content(paddingValues)
@@ -100,7 +100,7 @@ private fun ErrorContent(
     title: String,
     message: String?,
     actionLabel: String,
-    onTapActionButton: (() -> Unit)? = null
+    onClickActionButton: (() -> Unit)? = null
 ) {
     Box(
         modifier = modifier
@@ -119,7 +119,7 @@ private fun ErrorContent(
                     text = it
                 )
             }
-            onTapActionButton?.let {
+            onClickActionButton?.let {
                 Button(
                     shape = CircleShape,
                     onClick = it

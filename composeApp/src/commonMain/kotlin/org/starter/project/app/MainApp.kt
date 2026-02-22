@@ -13,15 +13,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import org.koin.compose.KoinContext
 import org.starter.project.navigation.AppNavHost
-import org.starter.project.navigation.AppRouter
 import org.starter.project.navigation.DeepLinkHandler
 import org.starter.project.navigation.rememberAppRouter
 import org.starter.project.ui.design.system.theme.SystemTheme
 
 @Composable
-fun Main(
-    appRouter: AppRouter = rememberAppRouter()
-) {
+fun Main() {
+    val appRouter = rememberAppRouter()
     KoinContext {
         SystemTheme {
             Box(

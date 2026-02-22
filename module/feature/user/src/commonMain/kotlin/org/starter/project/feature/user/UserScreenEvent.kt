@@ -2,25 +2,26 @@ package org.starter.project.feature.user
 
 import androidx.paging.compose.LazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
+import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
 
 internal sealed interface UserScreenEvent : ScreenEvent {
-    data object OnTapErrorScreenAction : UserScreenEvent
-    data object OnTapBack : UserScreenEvent
+    data object OnClickErrorScreenAction : UserScreenEvent
+    data object OnClickBack : UserScreenEvent
 }
 
 internal object UserScreenEventHandler {
     operator fun invoke(
         event: ScreenEvent,
-        articlesPagingItems: LazyPagingItems<Article>,
-        onNavigateBack: () -> Unit,
+        appRouter: AppRouter,
+        articlesPagingItems: LazyPagingItems<Article>
     ) {
         when (event) {
-            UserScreenEvent.OnTapErrorScreenAction -> {
+            UserScreenEvent.OnClickErrorScreenAction -> {
                 articlesPagingItems.refresh()
             }
-            UserScreenEvent.OnTapBack -> {
-                onNavigateBack()
+            UserScreenEvent.OnClickBack -> {
+                appRouter.popBackStack()
             }
             else -> {
                 /* no-op */

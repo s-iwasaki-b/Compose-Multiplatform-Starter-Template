@@ -45,8 +45,8 @@ fun SystemSearchBar(
     value: String = "",
     placeholder: String = stringResource(Res.string.search_bar_default_placeholder),
     onValueChange: (String) -> Unit = {},
-    onTapClear: () -> Unit = {},
-    onTapAction: () -> Unit = {}
+    onClickClear: () -> Unit = {},
+    onClickAction: () -> Unit = {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusState = remember { mutableStateOf(false) }
@@ -101,7 +101,7 @@ fun SystemSearchBar(
                             modifier = Modifier
                                 .size(20.dp)
                                 .clip(CircleShape)
-                                .clickable { onTapClear() },
+                                .clickable { onClickClear() },
                             painter = rememberVectorPainter(image = Icons.Default.Close),
                             contentDescription = null,
                             tint = Color.Gray
@@ -115,7 +115,7 @@ fun SystemSearchBar(
             keyboardActions = KeyboardActions {
                 focusManager.clearFocus()
                 keyboardController?.hide()
-                onTapAction()
+                onClickAction()
             }
         )
         if (focusState.value) {
@@ -125,7 +125,7 @@ fun SystemSearchBar(
                     .clickable {
                         focusManager.clearFocus()
                         keyboardController?.hide()
-                        onTapAction()
+                        onClickAction()
                     }
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 style = SystemTheme.typography.body2,

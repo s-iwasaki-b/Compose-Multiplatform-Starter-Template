@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -17,21 +18,21 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import io.github.aakira.napier.Napier
-import org.koin.compose.viewmodel.koinViewModel
 import org.starter.project.base.data.model.zenn.Article
-import org.starter.project.feature.home.component.article.articleList
+import org.starter.project.ui.shared.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.search.SystemSearchBar
 import org.starter.project.ui.design.system.theme.SystemTheme
-import org.starter.project.ui.route.Route
-import org.starter.project.ui.route.Router
+import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
 fun HomeScreen(
-    viewModel: HomeScreenViewModel = koinViewModel(),
-    appRouter: Router,
+    viewModel: HomeScreenViewModel,
+    appRouter: AppRouter,
     deepLinkKeyword: String? = null
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,17 +60,14 @@ fun HomeScreen(
     HomeScreenContent(
         state = state,
         articlesPagingItems = articlesPagingItems,
-        dispatch = { event ->
-            HomeScreenEventHandler(
-                event = event,
-                viewModel = viewModel,
-                articlesPagingItems = articlesPagingItems,
-                onNavigateToUser = { username ->
-                    appRouter.navigate(Route.User(username))
-                },
-            )
-        }
-    )
+    ) { event ->
+        HomeScreenEventHandler(
+            event = event,
+            appRouter = appRouter,
+            viewModel = viewModel,
+            articlesPagingItems = articlesPagingItems
+        )
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -81,17 +79,18 @@ private fun HomeScreenContent(
 ) {
     val listState = rememberLazyListState()
 
-    LaunchedEffect(articlesPagingItems.loadState.refresh) {
-        if (articlesPagingItems.loadState.refresh is LoadState.NotLoading) {
-            listState.scrollToItem(0)
-        }
+    LaunchedEffect(Unit) {
+        snapshotFlow { articlesPagingItems.loadState.refresh }
+            .drop(1) // 画面復帰時のスクロール位置リセットを防ぐ
+            .filter { it is LoadState.NotLoading }
+            .collect { listState.scrollToItem(0) }
     }
 
     SystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
-        onTapErrorActionButton = {
-            dispatch(HomeScreenEvent.OnTapErrorScreenAction)
+        onClickErrorActionButton = {
+            dispatch(HomeScreenEvent.OnClickErrorScreenAction)
         }
     ) { paddingValues ->
         LazyColumn(
@@ -108,13 +107,13 @@ private fun HomeScreenContent(
                         .padding(vertical = 16.dp),
                     value = state.searchKeyword,
                     onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },
-                    onTapClear = { dispatch(HomeScreenEvent.OnTapClearSearchKeyword) },
-                    onTapAction = { dispatch(HomeScreenEvent.OnTapActionSearchKeyword) }
+                    onClickClear = { dispatch(HomeScreenEvent.OnClickClearSearchKeyword) },
+                    onClickAction = { dispatch(HomeScreenEvent.OnClickActionSearchKeyword) }
                 )
             }
             articleList(
                 articlesPagingItems = articlesPagingItems,
-                onTapUser = { dispatch(HomeScreenEvent.OnTapUser(it)) },
+                onClickUser = { dispatch(HomeScreenEvent.OnClickUser(it)) },
             )
         }
     }

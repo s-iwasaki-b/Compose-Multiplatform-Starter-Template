@@ -10,40 +10,39 @@ import org.koin.core.parameter.parametersOf
 import org.starter.project.feature.home.HomeScreen
 import org.starter.project.feature.user.UserScreen
 import org.starter.project.feature.user.UserScreenViewModel
-import org.starter.project.ui.route.Route
+import org.starter.project.ui.route.AppRoute
 
 /**
  * https://developer.android.com/guide/navigation/design/type-safety
  */
 @Composable
-fun AppNavHost(
-    appRouter: AppRouter
+internal fun AppNavHost(
+    appRouter: AppRouterImpl
 ) {
-    NavHost(appRouter.navController, startDestination = Route.Home()) {
-        composable<Route.Home>(
+    NavHost(appRouter.navController, startDestination = AppRoute.Home()) {
+        composable<AppRoute.Home>(
             deepLinks = listOf(
-                navDeepLink<Route.Home>(
+                navDeepLink<AppRoute.Home>(
                     basePath = "${DeepLinkConfig.SCHEME}://home"
                 )
             )
         ) { backStackEntry ->
-            val route = backStackEntry.toRoute<Route.Home>()
+            val route = backStackEntry.toRoute<AppRoute.Home>()
             HomeScreen(
+                viewModel = koinViewModel(),
                 appRouter = appRouter,
                 deepLinkKeyword = route.keyword
             )
         }
-        composable<Route.User>(
+        composable<AppRoute.User>(
             deepLinks = listOf(
-                navDeepLink<Route.User>(
+                navDeepLink<AppRoute.User>(
                     basePath = "${DeepLinkConfig.SCHEME}://user"
                 )
             )
         ) { backStackEntry ->
-            val route = backStackEntry.toRoute<Route.User>()
-            val viewModel = koinViewModel<UserScreenViewModel> {
-                parametersOf(route.username)
-            }
+            val route = backStackEntry.toRoute<AppRoute.User>()
+            val viewModel = koinViewModel<UserScreenViewModel> { parametersOf(route.navArgs) }
             UserScreen(viewModel = viewModel, appRouter = appRouter)
         }
     }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="user_stat_articles">Articles</string>
+    <string name="user_stat_followers">Followers</string>
+    <string name="user_stat_following">Following</string>
+</resources>

@@ -4,13 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import org.starter.project.ui.route.Route
-import org.starter.project.ui.route.Router
+import org.starter.project.ui.route.AppRoute
+import org.starter.project.ui.route.AppRouter
 
-class AppRouter(
+internal class AppRouterImpl(
     internal val navController: NavHostController,
-) : Router {
-    override fun navigate(route: Route) {
+) : AppRouter {
+    override fun navigate(route: AppRoute) {
         navController.navigate(route)
     }
 
@@ -29,7 +29,7 @@ class AppRouter(
     }
 }
 
-internal fun parseDeepLinkUri(uri: String): Route? {
+internal fun parseDeepLinkUri(uri: String): AppRoute? {
     val schemeDelimiter = "://"
     val schemeEndIndex = uri.indexOf(schemeDelimiter)
     if (schemeEndIndex == -1) return null
@@ -48,18 +48,18 @@ internal fun parseDeepLinkUri(uri: String): Route? {
     } ?: emptyMap()
 
     return when {
-        path == "home" -> Route.Home(keyword = queryParams["keyword"])
+        path == "home" -> AppRoute.Home(keyword = queryParams["keyword"])
         path.startsWith("user/") -> {
             val username = path.removePrefix("user/")
-            if (username.isNotEmpty()) Route.User(username = username) else null
+            if (username.isNotEmpty()) AppRoute.User(username = username) else null
         }
         else -> null
     }
 }
 
 @Composable
-fun rememberAppRouter(
+internal fun rememberAppRouter(
     navController: NavHostController = rememberNavController()
 ) = remember(navController) {
-    AppRouter(navController)
+    AppRouterImpl(navController)
 }

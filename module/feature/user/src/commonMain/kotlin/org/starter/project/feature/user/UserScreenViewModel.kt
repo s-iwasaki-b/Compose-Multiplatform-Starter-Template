@@ -15,14 +15,15 @@ import kotlinx.coroutines.launch
 import org.starter.project.base.data.model.zenn.Articles
 import org.starter.project.base.extension.handle
 import org.starter.project.domain.service.ZennService
-import org.starter.project.feature.user.component.paging.UserArticlesPagingSource
+import org.starter.project.ui.shared.component.article.ArticlesPagingSource
+import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
 class UserScreenViewModel(
-    private val zennService: ZennService,
-    private val username: String,
+    private val navArgs: AppRoute.User.NavArgs,
+    private val zennService: ZennService
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(
         ScreenState(ScreenLoadingState.Initial(true), null)
@@ -42,9 +43,9 @@ class UserScreenViewModel(
     )
 
     val articlesPagingFlow = Pager(
-        PagingConfig(UserArticlesPagingSource.PAGE_SIZE)
+        PagingConfig(ArticlesPagingSource.PAGE_SIZE)
     ) {
-        UserArticlesPagingSource(
+        ArticlesPagingSource(
             onRefresh = ::updateScreenLoading,
             onLoadedFirstPage = ::updateScreenSuccess,
             fetcher = ::fetchUserArticles
@@ -58,7 +59,7 @@ class UserScreenViewModel(
     @VisibleForTesting
     internal fun fetchUser() {
         viewModelScope.launch {
-            zennService.fetchUser(username).handle(
+            zennService.fetchUser(navArgs.username).handle(
                 ErrorScreenThrowableHandler(_screenState)
             )?.let { user ->
                 _state.update { it.copy(user = user) }
@@ -85,7 +86,7 @@ class UserScreenViewModel(
     @VisibleForTesting
     internal suspend fun fetchUserArticles(key: String?): Articles? {
         return zennService.fetchUserArticles(
-            username = username,
+            username = navArgs.username,
             nextPage = key
         ).handle(ErrorScreenThrowableHandler(_screenState))
     }

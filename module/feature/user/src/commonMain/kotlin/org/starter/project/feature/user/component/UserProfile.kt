@@ -37,6 +37,7 @@ private val ExpandedVerticalPadding = 16.dp
 private val CollapsedVerticalPadding = 8.dp
 private val ExpandedElementSpacing = 8.dp
 private val CollapsedGap = 12.dp
+private val CollapsedRowSpacing = 4.dp
 private val ExpandedStatsSpacing = 24.dp
 private val CollapsedStatsSpacing = 16.dp
 
@@ -50,7 +51,6 @@ internal fun UserProfile(
 
     val avatarSizeDp = lerpDp(ExpandedAvatarSize, CollapsedAvatarSize, fraction)
     val verticalPadding = lerpDp(ExpandedVerticalPadding, CollapsedVerticalPadding, fraction)
-    val usernameAlpha = lerp(1f, 0f, (fraction * 2.5f).coerceAtMost(1f))
     val bioAlpha = lerp(1f, 0f, (fraction * 2f).coerceAtMost(1f))
     val statsSpacing = lerpDp(ExpandedStatsSpacing, CollapsedStatsSpacing, fraction)
 
@@ -73,12 +73,11 @@ internal fun UserProfile(
                 style = SystemTheme.typography.subtitle1,
                 text = user.name,
             )
-            // 2: Username (フェードアウト)
+            // 2: Username
             Text(
                 style = SystemTheme.typography.caption,
                 color = Color.Gray,
                 text = "@${user.username}",
-                modifier = Modifier.alpha(usernameAlpha),
             )
             // 3: Bio (フェードアウト、常に emit して高さ 0 で対応)
             Box(modifier = Modifier.alpha(bioAlpha)) {
@@ -141,34 +140,42 @@ internal fun UserProfile(
 
         val expandedHeight = expStatsY + statsPlaceable.height
 
-        // ── Collapsed: 1行の横並び [Avatar][Name]...[Stats] ──
-        val collapsedRowHeight = maxOf(
-            collapsedAvatarPx,
-            namePlaceable.height,
-            statsPlaceable.height,
-        )
+        // ── Collapsed: 中央揃え2段レイアウト ──
+        // Row 1: [Avatar][gap][Name / Username 縦並び] を中央揃え
+        val rowSpacing = CollapsedRowSpacing.roundToPx()
+        val nameUsernameWidth = maxOf(namePlaceable.width, usernamePlaceable.width)
+        val row1BlockWidth = collapsedAvatarPx + gap + nameUsernameWidth
+        val row1BlockX = (totalWidth - row1BlockWidth) / 2
 
-        val colAvatarX = 0
-        val colAvatarY = (collapsedRowHeight - collapsedAvatarPx) / 2
+        val nameUsernameHeight = namePlaceable.height + usernamePlaceable.height
+        val row1Height = maxOf(collapsedAvatarPx, nameUsernameHeight)
 
-        val colNameX = collapsedAvatarPx + gap
-        val colNameY = (collapsedRowHeight - namePlaceable.height) / 2
+        val colAvatarX = row1BlockX
+        val colAvatarY = (row1Height - collapsedAvatarPx) / 2
 
-        // Username / Bio: 下方向へスライドして clipToBounds で隠れる
-        val colUsernameX = colNameX
-        val colUsernameY = collapsedRowHeight
+        val textStartX = row1BlockX + collapsedAvatarPx + gap
+        val textBlockTopY = (row1Height - nameUsernameHeight) / 2
 
-        val colBioX = colNameX
-        val colBioY = collapsedRowHeight
+        val colNameX = textStartX
+        val colNameY = textBlockTopY
 
-        // Stats: 右寄せ
-        val colStatsX = totalWidth - statsPlaceable.width
-        val colStatsY = (collapsedRowHeight - statsPlaceable.height) / 2
+        // Username: Name の直下
+        val colUsernameX = textStartX
+        val colUsernameY = textBlockTopY + namePlaceable.height
+
+        // Bio: 下方向へスライドして clipToBounds で隠れる
+        val colBioX = textStartX
+        val colBioY = row1Height + rowSpacing + statsPlaceable.height
+
+        // Stats: Row 2 中央揃え
+        val colStatsX = (totalWidth - statsPlaceable.width) / 2
+        val colStatsY = row1Height + rowSpacing
 
         // ── Lerp ──
+        val collapsedHeight = colStatsY + statsPlaceable.height
         val height = lerp(
             expandedHeight.toFloat(),
-            collapsedRowHeight.toFloat(),
+            collapsedHeight.toFloat(),
             fraction,
         ).roundToInt()
 

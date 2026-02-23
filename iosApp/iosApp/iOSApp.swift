@@ -9,7 +9,7 @@ struct iOSApp: App {
         WindowGroup {
             ContentView()
                 .onOpenURL { url in
-                    DeepLinkHandler.shared.onDeepLinkReceived(uri: url.absoluteString)
+                    DeepLinkHandler.shared.onNewUri(uri: url.absoluteString)
                 }
         }
     }

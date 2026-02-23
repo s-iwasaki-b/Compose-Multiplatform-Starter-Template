@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
     private fun handleDeepLinkIntent(intent: Intent) {
         if (intent.action == Intent.ACTION_VIEW) {
             intent.data?.toString()?.let { uri ->
-                DeepLinkHandler.onDeepLinkReceived(uri)
+                DeepLinkHandler.onNewUri(uri)
             }
         }
     }

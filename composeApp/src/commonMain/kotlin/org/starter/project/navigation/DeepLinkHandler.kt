@@ -1,26 +1,22 @@
 package org.starter.project.navigation
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-
-/**
- * Bridge for passing deep link URIs from iOS (SwiftUI) to Compose Navigation.
- *
- * On Android, deep links are handled automatically via Intent -> NavController.
- * On iOS, there is no such mechanism, so this object acts as a bridge:
- * 1. SwiftUI's onOpenURL calls [onDeepLinkReceived]
- * 2. Compose observes [pendingDeepLink] and forwards to AppRouter
- */
 object DeepLinkHandler {
-    private val _pendingDeepLink = MutableStateFlow<String?>(null)
-    val pendingDeepLink: StateFlow<String?> = _pendingDeepLink.asStateFlow()
+    private var cached: String? = null
 
-    fun onDeepLinkReceived(uri: String) {
-        _pendingDeepLink.value = uri
-    }
+    var listener: ((uri: String) -> Unit)? = null
+        set(value) {
+            field = value
+            if (value != null) {
+                cached?.let { value.invoke(it) }
+                cached = null
+            }
+        }
 
-    fun consumeDeepLink() {
-        _pendingDeepLink.value = null
+    fun onNewUri(uri: String) {
+        cached = uri
+        listener?.let {
+            it.invoke(uri)
+            cached = null
+        }
     }
 }

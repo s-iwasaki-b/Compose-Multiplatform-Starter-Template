@@ -7,10 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavUri
 import org.koin.compose.KoinContext
 import org.starter.project.navigation.AppNavHost
 import org.starter.project.navigation.DeepLinkHandler
@@ -30,11 +29,12 @@ fun Main() {
             ) {
                 AppNavHost(appRouter)
 
-                val pendingDeepLink by DeepLinkHandler.pendingDeepLink.collectAsState()
-                LaunchedEffect(pendingDeepLink) {
-                    pendingDeepLink?.let { uri ->
-                        appRouter.handleDeepLink(uri)
-                        DeepLinkHandler.consumeDeepLink()
+                DisposableEffect(Unit) {
+                    DeepLinkHandler.listener = { uri ->
+                        appRouter.navController.navigate(NavUri(uri))
+                    }
+                    onDispose {
+                        DeepLinkHandler.listener = null
                     }
                 }
             }

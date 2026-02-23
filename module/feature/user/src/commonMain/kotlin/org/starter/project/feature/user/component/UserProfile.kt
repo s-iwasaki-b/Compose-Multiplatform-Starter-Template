@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Placeable
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -42,6 +44,12 @@ private val ExpandedElementSpacing = 8.dp
 private val CollapsedGap = 8.dp
 private val ExpandedStatsSpacing = 24.dp
 private val CollapsedStatsSpacing = 16.dp
+private const val BioMaxLines = 3
+private val ExpandedMaxTotalHeight = 300.dp
+private val CollapsedTotalHeight = CollapsedAvatarSize + CollapsedVerticalPadding * 2
+
+/** UserScreen で collapse アニメーション閾値として使用 */
+internal val UserProfileCollapseThresholdDp: Dp = ExpandedMaxTotalHeight - CollapsedTotalHeight
 
 // ─── レイアウト座標モデル ────────────────────────────────────────────
 
@@ -64,7 +72,6 @@ private data class LayoutPositions(
 internal fun UserProfile(
     user: User,
     collapseFraction: Float = 0f,
-    onHeightDeltaCalculated: ((Int) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val fraction = collapseFraction.coerceIn(0f, 1f)
@@ -105,6 +112,9 @@ internal fun UserProfile(
                     Text(
                         style = SystemTheme.typography.body2,
                         text = user.bio,
+                        textAlign = TextAlign.Center,
+                        maxLines = BioMaxLines,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }
@@ -134,14 +144,28 @@ internal fun UserProfile(
         val avatarPlaceable = measurables[0].measure(looseConstraints)
         val namePlaceable = measurables[1].measure(looseConstraints)
         val usernamePlaceable = measurables[2].measure(looseConstraints)
-        val bioPlaceable = measurables[3].measure(looseConstraints)
         val statsPlaceable = measurables[4].measure(looseConstraints)
+
+        // Bio: Expanded の固定高に収まるよう maxHeight を制限
+        val expandedSpacing = ExpandedElementSpacing.roundToPx()
+        val expandedAvatarSize = ExpandedAvatarSize.roundToPx()
+        val expandedContentHeight =
+            (ExpandedMaxTotalHeight - ExpandedVerticalPadding * 2).roundToPx()
+        val usedByOthers = expandedAvatarSize + expandedSpacing +
+            namePlaceable.height + expandedSpacing +
+            usernamePlaceable.height + expandedSpacing +
+            expandedSpacing + statsPlaceable.height
+        val bioMaxHeight = (expandedContentHeight - usedByOthers).coerceAtLeast(0)
+        val bioPlaceable = measurables[3].measure(
+            looseConstraints.copy(maxHeight = bioMaxHeight),
+        )
 
         // ── 2. 各状態の座標を算出 ───────────────────────────────
         val expanded = calculateExpandedPositions(
             totalWidth = totalWidth,
-            avatarSize = ExpandedAvatarSize.roundToPx(),
-            spacing = ExpandedElementSpacing.roundToPx(),
+            contentHeight = expandedContentHeight,
+            avatarSize = expandedAvatarSize,
+            spacing = expandedSpacing,
             namePlaceable = namePlaceable,
             usernamePlaceable = usernamePlaceable,
             bioPlaceable = bioPlaceable,
@@ -156,15 +180,7 @@ internal fun UserProfile(
             statsPlaceable = statsPlaceable,
         )
 
-        // ── 3. 高さの差分を報告（verticalPadding を含めた実際の表示高さ）
-        val expandedPaddingPx = ExpandedVerticalPadding.roundToPx() * 2
-        val collapsedPaddingPx = CollapsedVerticalPadding.roundToPx() * 2
-        val heightDelta =
-            (expanded.totalHeight + expandedPaddingPx) -
-            (collapsed.totalHeight + collapsedPaddingPx)
-        onHeightDeltaCalculated?.invoke(heightDelta)
-
-        // ── 4. 高さを補間して配置 ──────────────────────────────
+        // ── 3. 高さを補間して配置 ──────────────────────────────
         val height = lerpRound(expanded.totalHeight, collapsed.totalHeight, fraction)
 
         layout(totalWidth, height) {
@@ -189,6 +205,7 @@ internal fun UserProfile(
 
 private fun calculateExpandedPositions(
     totalWidth: Int,
+    contentHeight: Int,
     avatarSize: Int,
     spacing: Int,
     namePlaceable: Placeable,
@@ -219,7 +236,7 @@ private fun calculateExpandedPositions(
         username = username,
         bio = bio,
         stats = stats,
-        totalHeight = y,
+        totalHeight = y.coerceAtMost(contentHeight),
     )
 }
 
@@ -242,7 +259,7 @@ private fun calculateCollapsedPositions(
     statsPlaceable: Placeable,
 ): LayoutPositions {
     val nameUsernameHeight = namePlaceable.height + usernamePlaceable.height
-    val rowHeight = maxOf(avatarSize, nameUsernameHeight, statsPlaceable.height)
+    val rowHeight = avatarSize
 
     // Avatar: 左端、垂直中央
     val avatar = Position(

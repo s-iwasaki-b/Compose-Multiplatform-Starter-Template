@@ -20,7 +20,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -34,8 +36,6 @@ import org.starter.project.ui.design.system.theme.SystemTheme
 import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
-
-private const val CollapseScrollThreshold = 600
 
 @Composable
 fun UserScreen(
@@ -70,19 +70,21 @@ private fun UserScreenContent(
 ) {
     val listState = rememberLazyListState()
 
+    // UserProfile の expanded/collapsed 高さ差分を閾値として使用
+    var collapseThreshold by remember { mutableIntStateOf(1) }
+
     val collapseFraction by remember {
         derivedStateOf {
+            val threshold = collapseThreshold.coerceAtLeast(1)
             val firstVisibleIndex = listState.firstVisibleItemIndex
             val firstVisibleOffset = listState.firstVisibleItemScrollOffset
 
-            // スクロール済みのアイテム分 + 現在のオフセットを合算して閾値と比較
             val totalScroll = if (firstVisibleIndex > 0) {
-                // 最初のアイテムを越えたら十分スクロールされたとみなす
-                CollapseScrollThreshold.toFloat()
+                threshold.toFloat()
             } else {
                 firstVisibleOffset.toFloat()
             }
-            (totalScroll / CollapseScrollThreshold).coerceIn(0f, 1f)
+            (totalScroll / threshold).coerceIn(0f, 1f)
         }
     }
 
@@ -125,6 +127,11 @@ private fun UserScreenContent(
                 UserProfile(
                     user = user,
                     collapseFraction = collapseFraction,
+                    onHeightDeltaCalculated = { delta ->
+                        if (collapseThreshold != delta) {
+                            collapseThreshold = delta
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),

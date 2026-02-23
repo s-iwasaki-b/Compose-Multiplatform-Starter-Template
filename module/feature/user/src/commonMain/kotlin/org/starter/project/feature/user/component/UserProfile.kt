@@ -64,6 +64,7 @@ private data class LayoutPositions(
 internal fun UserProfile(
     user: User,
     collapseFraction: Float = 0f,
+    onHeightDeltaCalculated: ((Int) -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val fraction = collapseFraction.coerceIn(0f, 1f)
@@ -155,7 +156,15 @@ internal fun UserProfile(
             statsPlaceable = statsPlaceable,
         )
 
-        // ── 3. 高さを補間して配置 ──────────────────────────────
+        // ── 3. 高さの差分を報告（verticalPadding を含めた実際の表示高さ）
+        val expandedPaddingPx = ExpandedVerticalPadding.roundToPx() * 2
+        val collapsedPaddingPx = CollapsedVerticalPadding.roundToPx() * 2
+        val heightDelta =
+            (expanded.totalHeight + expandedPaddingPx) -
+            (collapsed.totalHeight + collapsedPaddingPx)
+        onHeightDeltaCalculated?.invoke(heightDelta)
+
+        // ── 4. 高さを補間して配置 ──────────────────────────────
         val height = lerpRound(expanded.totalHeight, collapsed.totalHeight, fraction)
 
         layout(totalWidth, height) {

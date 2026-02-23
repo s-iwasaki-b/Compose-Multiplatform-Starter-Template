@@ -35,7 +35,7 @@ import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
 
-private const val CollapseScrollThreshold = 300
+private const val CollapseScrollThreshold = 600
 
 @Composable
 fun UserScreen(

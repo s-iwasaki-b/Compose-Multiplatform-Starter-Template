@@ -97,6 +97,12 @@ fun ArticleListItem(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    style = SystemTheme.typography.caption,
+                    color = Color.DarkGray,
+                    text = article.publishedAt.take(10),
+                )
             }
         }
     }

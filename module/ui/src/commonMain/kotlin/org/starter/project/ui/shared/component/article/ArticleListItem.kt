@@ -79,7 +79,9 @@ fun ArticleListItem(
                 if (onClickUser != null) {
                     Spacer(modifier = Modifier.width(12.dp))
                     Row(
-                        modifier = Modifier.clickable { onClickUser(article.user.username) },
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .clickable { onClickUser(article.user.username) },
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         AsyncImage(

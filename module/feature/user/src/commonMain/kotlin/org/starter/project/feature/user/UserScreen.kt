@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import kotlinx.coroutines.flow.filterNotNull
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -119,10 +120,8 @@ private fun UserScreenContent(
             // Collapsed 後にスクロール可能量が不足し、iOS のバウンスで
             // Expanded/Collapsed 間の不安定な遷移が発生する。
             maxScroll >= threshold * 2
-        }.collect { result ->
-            if (result != null) {
-                collapseEnabled = result
-            }
+        }.filterNotNull().collect { result ->
+            collapseEnabled = result
         }
     }
 
@@ -132,15 +131,13 @@ private fun UserScreenContent(
             if (!collapseEnabled) return@derivedStateOf 0f
 
             val threshold = collapseThreshold.coerceAtLeast(1)
-            val visibleItems = listState.layoutInfo.visibleItemsInfo
-            if (visibleItems.isEmpty()) return@derivedStateOf 0f
-
             val firstIndex = listState.firstVisibleItemIndex
             val firstOffset = listState.firstVisibleItemScrollOffset
             val actualScroll = if (firstIndex == 0) {
                 firstOffset.toFloat()
             } else {
-                // 画面外アイテムの高さは表示中アイテムの平均で推定
+                val visibleItems = listState.layoutInfo.visibleItemsInfo
+                if (visibleItems.isEmpty()) return@derivedStateOf 0f
                 val avgItemHeight =
                     visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
                 firstIndex * avgItemHeight + firstOffset

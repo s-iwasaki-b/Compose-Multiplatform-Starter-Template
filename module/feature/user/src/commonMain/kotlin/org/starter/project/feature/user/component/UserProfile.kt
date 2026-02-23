@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -31,6 +32,8 @@ import org.starter.project.feature.user.resources.user_stat_followers
 import org.starter.project.feature.user.resources.user_stat_following
 import org.starter.project.ui.design.system.theme.SystemTheme
 
+// ─── 定数 ───────────────────────────────────────────────────────────
+
 private val ExpandedAvatarSize = 80.dp
 private val CollapsedAvatarSize = 40.dp
 private val ExpandedVerticalPadding = 16.dp
@@ -39,6 +42,23 @@ private val ExpandedElementSpacing = 8.dp
 private val CollapsedGap = 8.dp
 private val ExpandedStatsSpacing = 24.dp
 private val CollapsedStatsSpacing = 16.dp
+
+// ─── レイアウト座標モデル ────────────────────────────────────────────
+
+/** 要素の配置座標 (px) */
+private data class Position(val x: Int, val y: Int)
+
+/** 全要素の配置座標と合計高さ */
+private data class LayoutPositions(
+    val avatar: Position,
+    val name: Position,
+    val username: Position,
+    val bio: Position,
+    val stats: Position,
+    val totalHeight: Int,
+)
+
+// ─── メイン Composable ──────────────────────────────────────────────
 
 @Composable
 internal fun UserProfile(
@@ -78,7 +98,7 @@ internal fun UserProfile(
                 color = Color.Gray,
                 text = "@${user.username}",
             )
-            // 3: Bio (フェードアウト、常に emit して高さ 0 で対応)
+            // 3: Bio（フェードアウト対象）
             Box(modifier = Modifier.alpha(bioAlpha)) {
                 if (user.bio.isNotEmpty()) {
                     Text(
@@ -106,13 +126,9 @@ internal fun UserProfile(
             }
         }
     ) { measurables, constraints ->
-        val expandedAvatarPx = ExpandedAvatarSize.roundToPx()
-        val collapsedAvatarPx = CollapsedAvatarSize.roundToPx()
-        val spacing = ExpandedElementSpacing.roundToPx()
-        val gap = CollapsedGap.roundToPx()
         val totalWidth = constraints.maxWidth
 
-        // ── Measure ──
+        // ── 1. Measure ──────────────────────────────────────────
         val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
         val avatarPlaceable = measurables[0].measure(looseConstraints)
         val namePlaceable = measurables[1].measure(looseConstraints)
@@ -120,88 +136,161 @@ internal fun UserProfile(
         val bioPlaceable = measurables[3].measure(looseConstraints)
         val statsPlaceable = measurables[4].measure(looseConstraints)
 
-        // ── Expanded: 中央揃え縦並び ──
-        val expAvatarX = (totalWidth - expandedAvatarPx) / 2
-        val expAvatarY = 0
-
-        val expNameX = (totalWidth - namePlaceable.width) / 2
-        val expNameY = expandedAvatarPx + spacing
-
-        val expUsernameX = (totalWidth - usernamePlaceable.width) / 2
-        val expUsernameY = expNameY + namePlaceable.height + spacing
-
-        val expBioX = (totalWidth - bioPlaceable.width) / 2
-        val expBioY = expUsernameY + usernamePlaceable.height +
-            if (bioPlaceable.height > 0) spacing else 0
-
-        val expStatsX = (totalWidth - statsPlaceable.width) / 2
-        val expStatsY = expBioY + bioPlaceable.height + spacing
-
-        val expandedHeight = expStatsY + statsPlaceable.height
-
-        // ── Collapsed: [Avatar][Name/Username]...左端、[Stats]...右端 ──
-        val nameUsernameHeight = namePlaceable.height + usernamePlaceable.height
-
-        val collapsedRowHeight = maxOf(
-            collapsedAvatarPx,
-            nameUsernameHeight,
-            statsPlaceable.height,
+        // ── 2. 各状態の座標を算出 ───────────────────────────────
+        val expanded = calculateExpandedPositions(
+            totalWidth = totalWidth,
+            avatarSize = ExpandedAvatarSize.roundToPx(),
+            spacing = ExpandedElementSpacing.roundToPx(),
+            namePlaceable = namePlaceable,
+            usernamePlaceable = usernamePlaceable,
+            bioPlaceable = bioPlaceable,
+            statsPlaceable = statsPlaceable,
+        )
+        val collapsed = calculateCollapsedPositions(
+            totalWidth = totalWidth,
+            avatarSize = CollapsedAvatarSize.roundToPx(),
+            gap = CollapsedGap.roundToPx(),
+            namePlaceable = namePlaceable,
+            usernamePlaceable = usernamePlaceable,
+            statsPlaceable = statsPlaceable,
         )
 
-        // Avatar + Name/Username: 左端
-        val colAvatarX = 0
-        val colAvatarY = (collapsedRowHeight - collapsedAvatarPx) / 2
-
-        val textStartX = collapsedAvatarPx + gap
-        val textBlockTopY = (collapsedRowHeight - nameUsernameHeight) / 2
-
-        val colNameX = textStartX
-        val colNameY = textBlockTopY
-
-        // Username: Name の直下
-        val colUsernameX = textStartX
-        val colUsernameY = textBlockTopY + namePlaceable.height
-
-        // Bio: 下方向へスライドして clipToBounds で隠れる
-        val colBioX = textStartX
-        val colBioY = collapsedRowHeight
-
-        // Stats: 右端
-        val colStatsX = totalWidth - statsPlaceable.width
-        val colStatsY = (collapsedRowHeight - statsPlaceable.height) / 2
-
-        // ── Lerp ──
-        val collapsedHeight = collapsedRowHeight
-        val height = lerp(
-            expandedHeight.toFloat(),
-            collapsedHeight.toFloat(),
-            fraction,
-        ).roundToInt()
+        // ── 3. 高さを補間して配置 ──────────────────────────────
+        val height = lerpRound(expanded.totalHeight, collapsed.totalHeight, fraction)
 
         layout(totalWidth, height) {
-            avatarPlaceable.place(
-                x = lerpRound(expAvatarX, colAvatarX, fraction),
-                y = lerpRound(expAvatarY, colAvatarY, fraction),
-            )
-            namePlaceable.place(
-                x = lerpRound(expNameX, colNameX, fraction),
-                y = lerpRound(expNameY, colNameY, fraction),
-            )
-            usernamePlaceable.place(
-                x = lerpRound(expUsernameX, colUsernameX, fraction),
-                y = lerpRound(expUsernameY, colUsernameY, fraction),
-            )
-            bioPlaceable.place(
-                x = lerpRound(expBioX, colBioX, fraction),
-                y = lerpRound(expBioY, colBioY, fraction),
-            )
-            statsPlaceable.place(
-                x = lerpRound(expStatsX, colStatsX, fraction),
-                y = lerpRound(expStatsY, colStatsY, fraction),
-            )
+            placeWithLerp(avatarPlaceable, expanded.avatar, collapsed.avatar, fraction)
+            placeWithLerp(namePlaceable, expanded.name, collapsed.name, fraction)
+            placeWithLerp(usernamePlaceable, expanded.username, collapsed.username, fraction)
+            placeWithLerp(bioPlaceable, expanded.bio, collapsed.bio, fraction)
+            placeWithLerp(statsPlaceable, expanded.stats, collapsed.stats, fraction)
         }
     }
 }
+
+// ─── Expanded レイアウト計算 ─────────────────────────────────────────
+//
+//  中央揃え縦並び:
+//    [       Avatar       ]
+//    [        Name        ]
+//    [      Username      ]
+//    [        Bio         ]  ← fraction に応じてフェードアウト
+//    [       Stats        ]
+//
+
+private fun calculateExpandedPositions(
+    totalWidth: Int,
+    avatarSize: Int,
+    spacing: Int,
+    namePlaceable: Placeable,
+    usernamePlaceable: Placeable,
+    bioPlaceable: Placeable,
+    statsPlaceable: Placeable,
+): LayoutPositions {
+    var y = 0
+
+    val avatar = Position(x = (totalWidth - avatarSize) / 2, y = y)
+    y += avatarSize + spacing
+
+    val name = Position(x = (totalWidth - namePlaceable.width) / 2, y = y)
+    y += namePlaceable.height + spacing
+
+    val username = Position(x = (totalWidth - usernamePlaceable.width) / 2, y = y)
+    y += usernamePlaceable.height + if (bioPlaceable.height > 0) spacing else 0
+
+    val bio = Position(x = (totalWidth - bioPlaceable.width) / 2, y = y)
+    y += bioPlaceable.height + spacing
+
+    val stats = Position(x = (totalWidth - statsPlaceable.width) / 2, y = y)
+    y += statsPlaceable.height
+
+    return LayoutPositions(
+        avatar = avatar,
+        name = name,
+        username = username,
+        bio = bio,
+        stats = stats,
+        totalHeight = y,
+    )
+}
+
+// ─── Collapsed レイアウト計算 ────────────────────────────────────────
+//
+//  1行配置:
+//    [Avatar][gap][Name   ]          [  Stats  ]
+//                 [Username]
+//
+//  Avatar + Name/Username は左端、Stats は右端。
+//  Bio は行の下へ押し出して clipToBounds で隠す。
+//
+
+private fun calculateCollapsedPositions(
+    totalWidth: Int,
+    avatarSize: Int,
+    gap: Int,
+    namePlaceable: Placeable,
+    usernamePlaceable: Placeable,
+    statsPlaceable: Placeable,
+): LayoutPositions {
+    val nameUsernameHeight = namePlaceable.height + usernamePlaceable.height
+    val rowHeight = maxOf(avatarSize, nameUsernameHeight, statsPlaceable.height)
+
+    // Avatar: 左端、垂直中央
+    val avatar = Position(
+        x = 0,
+        y = (rowHeight - avatarSize) / 2,
+    )
+
+    // Name / Username: Avatar の右、垂直中央に2行ブロック
+    val textStartX = avatarSize + gap
+    val textBlockTopY = (rowHeight - nameUsernameHeight) / 2
+
+    val name = Position(x = textStartX, y = textBlockTopY)
+    val username = Position(x = textStartX, y = textBlockTopY + namePlaceable.height)
+
+    // Bio: 行の下に押し出す（clipToBounds で不可視）
+    val bio = Position(x = textStartX, y = rowHeight)
+
+    // Stats: 右端、垂直中央
+    val stats = Position(
+        x = totalWidth - statsPlaceable.width,
+        y = (rowHeight - statsPlaceable.height) / 2,
+    )
+
+    return LayoutPositions(
+        avatar = avatar,
+        name = name,
+        username = username,
+        bio = bio,
+        stats = stats,
+        totalHeight = rowHeight,
+    )
+}
+
+// ─── ヘルパー関数 ───────────────────────────────────────────────────
+
+/** expanded/collapsed 座標を fraction で補間して配置する */
+private fun Placeable.PlacementScope.placeWithLerp(
+    placeable: Placeable,
+    expanded: Position,
+    collapsed: Position,
+    fraction: Float,
+) {
+    placeable.place(
+        x = lerpRound(expanded.x, collapsed.x, fraction),
+        y = lerpRound(expanded.y, collapsed.y, fraction),
+    )
+}
+
+private fun lerpDp(start: Dp, stop: Dp, fraction: Float): Dp {
+    return Dp(lerp(start.value, stop.value, fraction))
+}
+
+private fun lerpRound(start: Int, stop: Int, fraction: Float): Int {
+    return lerp(start.toFloat(), stop.toFloat(), fraction).roundToInt()
+}
+
+// ─── サブ Composable ────────────────────────────────────────────────
 
 @Composable
 private fun UserStat(label: String, count: Int) {
@@ -218,13 +307,7 @@ private fun UserStat(label: String, count: Int) {
     }
 }
 
-private fun lerpDp(start: Dp, stop: Dp, fraction: Float): Dp {
-    return Dp(lerp(start.value, stop.value, fraction))
-}
-
-private fun lerpRound(start: Int, stop: Int, fraction: Float): Int {
-    return lerp(start.toFloat(), stop.toFloat(), fraction).roundToInt()
-}
+// ─── Preview ────────────────────────────────────────────────────────
 
 @Preview
 @Composable

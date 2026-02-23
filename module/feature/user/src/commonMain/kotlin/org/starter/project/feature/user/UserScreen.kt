@@ -1,10 +1,9 @@
 package org.starter.project.feature.user
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.foundation.lazy.LazyColumn
@@ -131,11 +130,10 @@ private fun UserScreenContent(
                         .padding(horizontal = 16.dp),
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
             Divider()
-            Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(
                 state = listState,
+                contentPadding = PaddingValues(top = 16.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),

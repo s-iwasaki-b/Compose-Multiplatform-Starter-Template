@@ -1,11 +1,12 @@
 package org.starter.project.feature.user
 
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -72,13 +73,14 @@ private fun UserScreenContent(
             val firstVisibleIndex = listState.firstVisibleItemIndex
             val firstVisibleOffset = listState.firstVisibleItemScrollOffset
 
-            if (firstVisibleIndex > 0) {
-                // UserProfile ヘッダーを通過済み → 完全にコラプス
-                1f
+            // スクロール済みのアイテム分 + 現在のオフセットを合算して閾値と比較
+            val totalScroll = if (firstVisibleIndex > 0) {
+                // 最初のアイテムを越えたら十分スクロールされたとみなす
+                CollapseScrollThreshold.toFloat()
             } else {
-                // UserProfile 内のスクロール量で 0f..1f を補間
-                (firstVisibleOffset.toFloat() / CollapseScrollThreshold).coerceIn(0f, 1f)
+                firstVisibleOffset.toFloat()
             }
+            (totalScroll / CollapseScrollThreshold).coerceIn(0f, 1f)
         }
     }
 
@@ -111,23 +113,29 @@ private fun UserScreenContent(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            state = listState,
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .fillMaxSize(),
         ) {
-            item(key = "user_profile_header") {
-                state.user?.let { user ->
-                    UserProfile(
-                        user = user,
-                        collapseFraction = collapseFraction,
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+            // UserProfile は LazyColumn の外に配置し、常に画面上部に固定
+            state.user?.let { user ->
+                UserProfile(
+                    user = user,
+                    collapseFraction = collapseFraction,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                )
             }
-            articleList(articlesPagingItems)
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+            ) {
+                articleList(articlesPagingItems)
+            }
         }
     }
 }

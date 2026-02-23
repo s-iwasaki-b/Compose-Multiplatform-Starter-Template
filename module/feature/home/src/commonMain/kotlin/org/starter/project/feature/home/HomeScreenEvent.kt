@@ -12,6 +12,8 @@ internal sealed interface HomeScreenEvent : ScreenEvent {
     data object OnClickClearSearchKeyword : HomeScreenEvent
     data object OnClickActionSearchKeyword : HomeScreenEvent
     data class OnClickUser(val username: String) : HomeScreenEvent
+    data object OnPullToRefresh : HomeScreenEvent
+    data object OnPullToRefreshComplete : HomeScreenEvent
 }
 
 internal object HomeScreenEventHandler {
@@ -41,6 +43,15 @@ internal object HomeScreenEventHandler {
 
             is HomeScreenEvent.OnClickUser -> {
                 appRouter.navigate(AppRoute.User(event.username))
+            }
+
+            HomeScreenEvent.OnPullToRefresh -> {
+                viewModel.updatePullToRefreshing(true)
+                articlesPagingItems.refresh()
+            }
+
+            HomeScreenEvent.OnPullToRefreshComplete -> {
+                viewModel.updatePullToRefreshing(false)
             }
 
             else -> {

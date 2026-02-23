@@ -2,15 +2,21 @@ package org.starter.project.feature.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -68,7 +74,7 @@ fun HomeScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun HomeScreenContent(
     state: HomeScreenState,
@@ -76,12 +82,23 @@ private fun HomeScreenContent(
     dispatch: (event: ScreenEvent) -> Unit
 ) {
     val listState = rememberLazyListState()
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = state.isPullToRefreshing,
+        onRefresh = { dispatch(HomeScreenEvent.OnPullToRefresh) }
+    )
 
     LaunchedEffect(Unit) {
         snapshotFlow { articlesPagingItems.loadState.refresh }
             .drop(1) // 画面復帰時のスクロール位置リセットを防ぐ
             .filter { it is LoadState.NotLoading }
             .collect { listState.scrollToItem(0) }
+    }
+
+    LaunchedEffect(state.isPullToRefreshing) {
+        if (!state.isPullToRefreshing) return@LaunchedEffect
+        snapshotFlow { articlesPagingItems.loadState.refresh }
+            .filter { it is LoadState.NotLoading || it is LoadState.Error }
+            .collect { dispatch(HomeScreenEvent.OnPullToRefreshComplete) }
     }
 
     SystemScaffold(
@@ -91,27 +108,38 @@ private fun HomeScreenContent(
             dispatch(HomeScreenEvent.OnClickErrorScreenAction)
         }
     ) { paddingValues ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            state = listState
+                .pullRefresh(pullRefreshState)
         ) {
-            stickyHeader(key = "search_bar") {
-                SystemSearchBar(
-                    modifier = Modifier
-                        .background(SystemTheme.colors.background)
-                        .padding(vertical = 16.dp),
-                    value = state.searchKeyword,
-                    onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },
-                    onClickClear = { dispatch(HomeScreenEvent.OnClickClearSearchKeyword) },
-                    onClickAction = { dispatch(HomeScreenEvent.OnClickActionSearchKeyword) }
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                state = listState
+            ) {
+                stickyHeader(key = "search_bar") {
+                    SystemSearchBar(
+                        modifier = Modifier
+                            .background(SystemTheme.colors.background)
+                            .padding(vertical = 16.dp),
+                        value = state.searchKeyword,
+                        onValueChange = { dispatch(HomeScreenEvent.OnChangeSearchKeyword(it)) },
+                        onClickClear = { dispatch(HomeScreenEvent.OnClickClearSearchKeyword) },
+                        onClickAction = { dispatch(HomeScreenEvent.OnClickActionSearchKeyword) }
+                    )
+                }
+                articleList(
+                    articlesPagingItems = articlesPagingItems,
+                    onClickUser = { dispatch(HomeScreenEvent.OnClickUser(it)) },
                 )
             }
-            articleList(
-                articlesPagingItems = articlesPagingItems,
-                onClickUser = { dispatch(HomeScreenEvent.OnClickUser(it)) },
+            PullRefreshIndicator(
+                refreshing = state.isPullToRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
     }

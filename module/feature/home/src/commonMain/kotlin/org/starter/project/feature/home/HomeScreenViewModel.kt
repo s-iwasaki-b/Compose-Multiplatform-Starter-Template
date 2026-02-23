@@ -66,9 +66,15 @@ class HomeScreenViewModel(
 
     @VisibleForTesting
     internal fun updateScreenLoading() {
+        // Pull-to-refresh中はインジケーターで更新中であることを示すため、全画面ローディングを抑制する
+        if (_state.value.isPullToRefreshing) return
         _screenState.update {
             it.copy(screenLoadingState = ScreenLoadingState.Loading())
         }
+    }
+
+    fun updatePullToRefreshing(isRefreshing: Boolean) {
+        _state.update { it.copy(isPullToRefreshing = isRefreshing) }
     }
 
     @VisibleForTesting

@@ -37,7 +37,6 @@ private val ExpandedVerticalPadding = 16.dp
 private val CollapsedVerticalPadding = 8.dp
 private val ExpandedElementSpacing = 8.dp
 private val CollapsedGap = 8.dp
-private val CollapsedSectionGap = 16.dp
 private val ExpandedStatsSpacing = 24.dp
 private val CollapsedStatsSpacing = 16.dp
 
@@ -140,33 +139,35 @@ internal fun UserProfile(
 
         val expandedHeight = expStatsY + statsPlaceable.height
 
-        // ── Collapsed: 1行中央揃え [Avatar][gap][Name][gap][Username][sectionGap][Stats] ──
-        val sectionGap = CollapsedSectionGap.roundToPx()
-        val rowContentWidth = collapsedAvatarPx + gap + namePlaceable.width +
-            gap + usernamePlaceable.width + sectionGap + statsPlaceable.width
-        val rowStartX = (totalWidth - rowContentWidth) / 2
+        // ── Collapsed: [Avatar][Name/Username]...左端、[Stats]...右端 ──
+        val nameUsernameHeight = namePlaceable.height + usernamePlaceable.height
 
         val collapsedRowHeight = maxOf(
             collapsedAvatarPx,
-            namePlaceable.height,
-            usernamePlaceable.height,
+            nameUsernameHeight,
             statsPlaceable.height,
         )
 
-        val colAvatarX = rowStartX
+        // Avatar + Name/Username: 左端
+        val colAvatarX = 0
         val colAvatarY = (collapsedRowHeight - collapsedAvatarPx) / 2
 
-        val colNameX = rowStartX + collapsedAvatarPx + gap
-        val colNameY = (collapsedRowHeight - namePlaceable.height) / 2
+        val textStartX = collapsedAvatarPx + gap
+        val textBlockTopY = (collapsedRowHeight - nameUsernameHeight) / 2
 
-        val colUsernameX = colNameX + namePlaceable.width + gap
-        val colUsernameY = (collapsedRowHeight - usernamePlaceable.height) / 2
+        val colNameX = textStartX
+        val colNameY = textBlockTopY
+
+        // Username: Name の直下
+        val colUsernameX = textStartX
+        val colUsernameY = textBlockTopY + namePlaceable.height
 
         // Bio: 下方向へスライドして clipToBounds で隠れる
-        val colBioX = colNameX
+        val colBioX = textStartX
         val colBioY = collapsedRowHeight
 
-        val colStatsX = colUsernameX + usernamePlaceable.width + sectionGap
+        // Stats: 右端
+        val colStatsX = totalWidth - statsPlaceable.width
         val colStatsY = (collapsedRowHeight - statsPlaceable.height) / 2
 
         // ── Lerp ──

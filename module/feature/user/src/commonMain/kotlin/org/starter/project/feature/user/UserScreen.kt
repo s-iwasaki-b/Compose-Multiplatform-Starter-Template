@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -20,10 +19,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
@@ -73,18 +77,28 @@ private fun UserScreenContent(
     // UserProfile の expanded/collapsed 高さ差分を閾値として使用
     var collapseThreshold by remember { mutableIntStateOf(1) }
 
+    // LazyColumn の累積スクロール量を追跡
+    val accumulatedScroll = remember { mutableFloatStateOf(0f) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource,
+            ): Offset {
+                // consumed.y < 0 でスクロール↓、> 0 でスクロール↑
+                accumulatedScroll.floatValue =
+                    (accumulatedScroll.floatValue - consumed.y).coerceAtLeast(0f)
+                return Offset.Zero
+            }
+        }
+    }
+
     val collapseFraction by remember {
         derivedStateOf {
             val threshold = collapseThreshold.coerceAtLeast(1)
-            val firstVisibleIndex = listState.firstVisibleItemIndex
-            val firstVisibleOffset = listState.firstVisibleItemScrollOffset
-
-            val totalScroll = if (firstVisibleIndex > 0) {
-                threshold.toFloat()
-            } else {
-                firstVisibleOffset.toFloat()
-            }
-            (totalScroll / threshold).coerceIn(0f, 1f)
+            (accumulatedScroll.floatValue / threshold).coerceIn(0f, 1f)
         }
     }
 
@@ -142,6 +156,7 @@ private fun UserScreenContent(
                 state = listState,
                 contentPadding = PaddingValues(top = 16.dp),
                 modifier = Modifier
+                    .nestedScroll(nestedScrollConnection)
                     .fillMaxSize()
                     .padding(horizontal = 16.dp),
             ) {

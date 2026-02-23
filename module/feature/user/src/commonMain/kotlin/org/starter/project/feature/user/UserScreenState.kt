@@ -7,5 +7,6 @@ import org.starter.project.ui.shared.state.ScreenState
 @Immutable
 internal data class UserScreenState(
     val screenState: ScreenState,
+    val username: String? = null,
     val user: User? = null,
 )

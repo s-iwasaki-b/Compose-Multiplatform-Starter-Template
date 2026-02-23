@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavUri
+import androidx.navigation.navOptions
 import org.koin.compose.KoinContext
 import org.starter.project.navigation.AppNavHost
 import org.starter.project.navigation.DeepLinkHandler
@@ -31,7 +32,10 @@ fun Main() {
 
                 DisposableEffect(Unit) {
                     DeepLinkHandler.listener = { uri ->
-                        appRouter.navController.navigate(NavUri(uri))
+                        appRouter.navController.navigate(
+                            NavUri(uri),
+                            navOptions { launchSingleTop = true }
+                        )
                     }
                     onDispose {
                         DeepLinkHandler.listener = null

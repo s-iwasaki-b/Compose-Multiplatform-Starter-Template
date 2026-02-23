@@ -8,6 +8,7 @@ import androidx.navigation.toRoute
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.starter.project.feature.home.HomeScreen
+import org.starter.project.feature.home.HomeScreenViewModel
 import org.starter.project.feature.user.UserScreen
 import org.starter.project.feature.user.UserScreenViewModel
 import org.starter.project.ui.route.AppRoute
@@ -28,11 +29,8 @@ internal fun AppNavHost(
             )
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<AppRoute.Home>()
-            HomeScreen(
-                viewModel = koinViewModel(),
-                appRouter = appRouter,
-                deepLinkKeyword = route.keyword
-            )
+            val viewModel = koinViewModel<HomeScreenViewModel>()
+            HomeScreen(viewModel = viewModel, appRouter = appRouter, navArgs = route.navArgs)
         }
         composable<AppRoute.User>(
             deepLinks = listOf(
@@ -42,8 +40,8 @@ internal fun AppNavHost(
             )
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<AppRoute.User>()
-            val viewModel = koinViewModel<UserScreenViewModel> { parametersOf(route.navArgs) }
-            UserScreen(viewModel = viewModel, appRouter = appRouter)
+            val viewModel = koinViewModel<UserScreenViewModel>()
+            UserScreen(viewModel = viewModel, appRouter = appRouter, navArgs = route.navArgs)
         }
     }
 }

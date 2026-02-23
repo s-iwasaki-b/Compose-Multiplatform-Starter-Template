@@ -95,8 +95,8 @@ private fun UserScreenContent(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
         ) {
-            state.user?.let { user ->
-                item(key = "user_profile_header") {
+            item(key = "user_profile_header") {
+                state.user?.let { user ->
                     UserProfile(user = user)
                     Spacer(modifier = Modifier.height(16.dp))
                 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -14,7 +15,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -28,6 +31,8 @@ import org.starter.project.ui.design.system.theme.SystemTheme
 import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
+
+private const val CollapseScrollThreshold = 300
 
 @Composable
 fun UserScreen(
@@ -60,6 +65,23 @@ private fun UserScreenContent(
     articlesPagingItems: LazyPagingItems<Article>,
     dispatch: (event: ScreenEvent) -> Unit,
 ) {
+    val listState = rememberLazyListState()
+
+    val collapseFraction by remember {
+        derivedStateOf {
+            val firstVisibleIndex = listState.firstVisibleItemIndex
+            val firstVisibleOffset = listState.firstVisibleItemScrollOffset
+
+            if (firstVisibleIndex > 0) {
+                // UserProfile ヘッダーを通過済み → 完全にコラプス
+                1f
+            } else {
+                // UserProfile 内のスクロール量で 0f..1f を補間
+                (firstVisibleOffset.toFloat() / CollapseScrollThreshold).coerceIn(0f, 1f)
+            }
+        }
+    }
+
     SystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
@@ -90,6 +112,7 @@ private fun UserScreenContent(
         }
     ) { paddingValues ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
@@ -97,7 +120,10 @@ private fun UserScreenContent(
         ) {
             item(key = "user_profile_header") {
                 state.user?.let { user ->
-                    UserProfile(user = user)
+                    UserProfile(
+                        user = user,
+                        collapseFraction = collapseFraction,
+                    )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
             }

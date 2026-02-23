@@ -7,9 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavUri
+import androidx.navigation.navOptions
 import org.koin.compose.KoinContext
 import org.starter.project.navigation.AppNavHost
+import org.starter.project.navigation.DeepLinkHandler
 import org.starter.project.navigation.rememberAppRouter
 import org.starter.project.ui.design.system.theme.SystemTheme
 
@@ -25,6 +29,18 @@ fun Main() {
                     .windowInsetsPadding(WindowInsets.safeDrawing)
             ) {
                 AppNavHost(appRouter)
+
+                DisposableEffect(Unit) {
+                    DeepLinkHandler.listener = { uri ->
+                        appRouter.navController.navigate(
+                            NavUri(uri),
+                            navOptions { launchSingleTop = true }
+                        )
+                    }
+                    onDispose {
+                        DeepLinkHandler.listener = null
+                    }
+                }
             }
         }
     }

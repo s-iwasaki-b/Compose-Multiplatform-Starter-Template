@@ -18,34 +18,42 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import io.github.aakira.napier.Napier
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
-import io.github.aakira.napier.Napier
 import org.starter.project.base.data.model.zenn.Article
-import org.starter.project.ui.shared.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.search.SystemSearchBar
 import org.starter.project.ui.design.system.theme.SystemTheme
+import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.route.AppRouter
+import org.starter.project.ui.shared.component.article.articleList
 import org.starter.project.ui.shared.event.ScreenEvent
 
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
-    appRouter: AppRouter
+    appRouter: AppRouter,
+    navArgs: AppRoute.Home.NavArgs
 ) {
     val state by viewModel.state.collectAsState()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
 
     // This is an example of lifecycle event listener
     // cf. https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-lifecycle.html#mapping-android-lifecycle-to-other-platforms
-    LifecycleEventEffect(Lifecycle.Event.ON_START) {
-        Napier.d { "HomeScreen.onStart" }
-        viewModel.initSearchKeyword()
-    }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) { Napier.d { "HomeScreen.onStart" } }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { Napier.d { "HomeScreen.onResume" } }
     LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) { Napier.d { "HomeScreen.onPause" } }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { Napier.d { "HomeScreen.onStop" } }
+
+    val keyword = navArgs.keyword
+    LaunchedEffect(keyword) {
+        if (keyword != null) {
+            viewModel.updateSearchKeyword(keyword)
+        } else {
+            viewModel.initSearchKeyword()
+        }
+    }
 
     HomeScreenContent(
         state = state,

@@ -12,6 +12,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -24,6 +25,7 @@ import org.starter.project.feature.user.component.UserProfile
 import org.starter.project.ui.shared.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.theme.SystemTheme
+import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
 
@@ -31,9 +33,14 @@ import org.starter.project.ui.shared.event.ScreenEvent
 fun UserScreen(
     viewModel: UserScreenViewModel,
     appRouter: AppRouter,
+    navArgs: AppRoute.User.NavArgs
 ) {
     val state by viewModel.state.collectAsState()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
+
+    LaunchedEffect(navArgs.username) {
+        viewModel.refreshUser(navArgs.username)
+    }
 
     UserScreenContent(
         state = state,
@@ -88,8 +95,8 @@ private fun UserScreenContent(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
         ) {
-            state.user?.let { user ->
-                item(key = "user_profile_header") {
+            item(key = "user_profile_header") {
+                state.user?.let { user ->
                     UserProfile(user = user)
                     Spacer(modifier = Modifier.height(16.dp))
                 }

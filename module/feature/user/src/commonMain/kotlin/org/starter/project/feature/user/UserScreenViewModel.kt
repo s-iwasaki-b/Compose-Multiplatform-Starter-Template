@@ -6,9 +6,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -16,13 +20,11 @@ import org.starter.project.base.data.model.zenn.Articles
 import org.starter.project.base.extension.handle
 import org.starter.project.domain.service.ZennService
 import org.starter.project.ui.shared.component.article.ArticlesPagingSource
-import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
 
 class UserScreenViewModel(
-    private val navArgs: AppRoute.User.NavArgs,
     private val zennService: ZennService
 ) : ViewModel() {
     private val _screenState = MutableStateFlow(
@@ -42,28 +44,42 @@ class UserScreenViewModel(
         _state.value
     )
 
-    val articlesPagingFlow = Pager(
-        PagingConfig(ArticlesPagingSource.PAGE_SIZE)
-    ) {
-        ArticlesPagingSource(
-            onRefresh = ::updateScreenLoading,
-            onLoadedFirstPage = ::updateScreenSuccess,
-            fetcher = ::fetchUserArticles
-        )
-    }.flow.cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val articlesPagingFlow = _state
+        .mapNotNull { it.username }
+        .distinctUntilChanged()
+        .flatMapLatest { username ->
+            Pager(PagingConfig(ArticlesPagingSource.PAGE_SIZE)) {
+                ArticlesPagingSource(
+                    onRefresh = ::updateScreenLoading,
+                    onLoadedFirstPage = ::updateScreenSuccess,
+                    fetcher = { key -> fetchUserArticles(username, key) }
+                )
+            }.flow
+        }
+        .cachedIn(viewModelScope)
 
     init {
         fetchUser()
     }
 
+    fun refreshUser(username: String) {
+        _state.update { it.copy(username = username) }
+    }
+
     @VisibleForTesting
     internal fun fetchUser() {
         viewModelScope.launch {
-            zennService.fetchUser(navArgs.username).handle(
-                ErrorScreenThrowableHandler(_screenState)
-            )?.let { user ->
-                _state.update { it.copy(user = user) }
-            }
+            _state
+                .mapNotNull { it.username }
+                .distinctUntilChanged()
+                .collect { username ->
+                    zennService.fetchUser(username).handle(
+                        ErrorScreenThrowableHandler(_screenState)
+                    )?.let { user ->
+                        _state.update { it.copy(user = user) }
+                    }
+                }
         }
     }
 
@@ -84,9 +100,9 @@ class UserScreenViewModel(
     }
 
     @VisibleForTesting
-    internal suspend fun fetchUserArticles(key: String?): Articles? {
+    internal suspend fun fetchUserArticles(keyword: String, key: String?): Articles? {
         return zennService.fetchUserArticles(
-            username = navArgs.username,
+            username = keyword,
             nextPage = key
         ).handle(ErrorScreenThrowableHandler(_screenState))
     }

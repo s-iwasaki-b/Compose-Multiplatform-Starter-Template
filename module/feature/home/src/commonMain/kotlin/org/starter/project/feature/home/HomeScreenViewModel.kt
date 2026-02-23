@@ -6,9 +6,15 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.starter.project.base.data.model.zenn.Articles
@@ -19,6 +25,7 @@ import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.handler.IgnoreThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenViewModel(
     private val zennService: ZennService
@@ -40,15 +47,22 @@ class HomeScreenViewModel(
         _state.value
     )
 
-    val articlesPagingFlow = Pager(
-        PagingConfig(ArticlesPagingSource.PAGE_SIZE)
-    ) {
-        ArticlesPagingSource(
-            onRefresh = ::updateScreenLoading,
-            onLoadedFirstPage = ::updateScreenSuccess,
-            fetcher = ::fetchArticles
-        )
-    }.flow.cachedIn(viewModelScope)
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    val articlesPagingFlow = _state
+        .map { it.searchKeyword }
+        .distinctUntilChanged()
+        .debounce(300.milliseconds)
+        .flatMapLatest { searchKeyword ->
+            Pager(
+                PagingConfig(ArticlesPagingSource.PAGE_SIZE)
+            ) {
+                ArticlesPagingSource(
+                    onRefresh = ::updateScreenLoading,
+                    onLoadedFirstPage = ::updateScreenSuccess,
+                    fetcher = { key -> fetchArticles(searchKeyword, key) }
+                )
+            }.flow
+        }.cachedIn(viewModelScope)
 
     @VisibleForTesting
     internal fun updateScreenLoading() {
@@ -67,9 +81,9 @@ class HomeScreenViewModel(
     }
 
     @VisibleForTesting
-    internal suspend fun fetchArticles(key: String?): Articles? {
+    internal suspend fun fetchArticles(keyword: String, key: String?): Articles? {
         return zennService.fetchArticles(
-            keyword = _state.value.searchKeyword,
+            keyword = keyword,
             nextPage = key
         ).handle(ErrorScreenThrowableHandler(_screenState))
     }

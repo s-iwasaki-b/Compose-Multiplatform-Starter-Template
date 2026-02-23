@@ -1,7 +1,6 @@
 package org.starter.project.feature.user.component
 
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -225,37 +224,3 @@ private fun lerpDp(start: Dp, stop: Dp, fraction: Float): Dp {
 private fun lerpRound(start: Int, stop: Int, fraction: Float): Int {
     return lerp(start.toFloat(), stop.toFloat(), fraction).roundToInt()
 }
-
-@Preview
-@Composable
-private fun UserProfileExpandedPreview() {
-    SystemTheme {
-        UserProfile(
-            user = previewUser(),
-            collapseFraction = 0f,
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun UserProfileCollapsedPreview() {
-    SystemTheme {
-        UserProfile(
-            user = previewUser(),
-            collapseFraction = 1f,
-        )
-    }
-}
-
-private fun previewUser() = User(
-    id = 1,
-    username = "johndoe",
-    name = "John Doe",
-    avatarSmallUrl = "",
-    avatarUrl = "",
-    bio = "Android & iOS developer",
-    followerCount = 120,
-    followingCount = 45,
-    articlesCount = 30,
-)

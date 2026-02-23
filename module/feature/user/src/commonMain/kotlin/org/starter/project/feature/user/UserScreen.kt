@@ -98,6 +98,19 @@ private fun UserScreenContent(
     val collapseFraction by remember {
         derivedStateOf {
             val threshold = collapseThreshold.coerceAtLeast(1)
+            val layoutInfo = listState.layoutInfo
+            val visibleItems = layoutInfo.visibleItemsInfo
+
+            // 全アイテムが画面内に収まり、スクロール可能量が閾値未満なら常に展開
+            if (visibleItems.isNotEmpty() && visibleItems.size >= layoutInfo.totalItemsCount) {
+                val lastItem = visibleItems.last()
+                val contentBottom = lastItem.offset + lastItem.size + layoutInfo.afterContentPadding
+                val maxScroll = (contentBottom - layoutInfo.viewportSize.height).coerceAtLeast(0)
+                if (maxScroll < threshold) {
+                    return@derivedStateOf 0f
+                }
+            }
+
             (accumulatedScroll.floatValue / threshold).coerceIn(0f, 1f)
         }
     }

@@ -47,7 +47,11 @@ fun HomeScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { Napier.d { "HomeScreen.onStop" } }
 
     LaunchedEffect(navArgs.keyword) {
-        navArgs.keyword?.let { viewModel.updateSearchKeyword(it) }
+        if (navArgs.keyword != null) {
+            viewModel.updateSearchKeyword(navArgs.keyword)
+        } else {
+            viewModel.initSearchKeyword()
+        }
     }
 
     HomeScreenContent(

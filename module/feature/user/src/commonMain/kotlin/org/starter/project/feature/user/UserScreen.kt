@@ -101,11 +101,22 @@ private fun UserScreenContent(
             val layoutInfo = listState.layoutInfo
             val visibleItems = layoutInfo.visibleItemsInfo
 
-            // 全アイテムが画面内に収まり、スクロール可能量が閾値未満なら常に展開
-            if (visibleItems.isNotEmpty() && visibleItems.size >= layoutInfo.totalItemsCount) {
-                val lastItem = visibleItems.last()
-                val contentBottom = lastItem.offset + lastItem.size + layoutInfo.afterContentPadding
-                val maxScroll = (contentBottom - layoutInfo.viewportSize.height).coerceAtLeast(0)
+            // スクロール可能量が閾値未満ならレイアウト変化が途中で止まるため展開を維持
+            if (visibleItems.isNotEmpty()) {
+                val totalItemsCount = layoutInfo.totalItemsCount
+                val maxScroll = if (visibleItems.size >= totalItemsCount) {
+                    // 全アイテムが画面内：正確に計算可能
+                    val lastItem = visibleItems.last()
+                    val contentBottom =
+                        lastItem.offset + lastItem.size + layoutInfo.afterContentPadding
+                    (contentBottom - layoutInfo.viewportSize.height).coerceAtLeast(0)
+                } else {
+                    // 一部のアイテムのみ表示：平均高さから推定
+                    val avgItemHeight = visibleItems.sumOf { it.size } / visibleItems.size
+                    val estimatedContentHeight = avgItemHeight * totalItemsCount +
+                        layoutInfo.beforeContentPadding + layoutInfo.afterContentPadding
+                    (estimatedContentHeight - layoutInfo.viewportSize.height).coerceAtLeast(0)
+                }
                 if (maxScroll < threshold) {
                     return@derivedStateOf 0f
                 }

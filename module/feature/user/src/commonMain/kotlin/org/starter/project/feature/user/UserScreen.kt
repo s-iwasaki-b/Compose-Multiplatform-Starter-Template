@@ -1,10 +1,13 @@
 package org.starter.project.feature.user
 
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -14,14 +17,18 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.feature.user.component.UserProfile
+import org.starter.project.feature.user.component.UserProfileCollapseThresholdDp
 import org.starter.project.ui.shared.component.article.articleList
 import org.starter.project.ui.design.system.scaffold.SystemScaffold
 import org.starter.project.ui.design.system.theme.SystemTheme
@@ -60,6 +67,37 @@ private fun UserScreenContent(
     articlesPagingItems: LazyPagingItems<Article>,
     dispatch: (event: ScreenEvent) -> Unit,
 ) {
+    val listState = rememberLazyListState()
+
+    // UserProfile の expanded/collapsed 高さ差分をアニメーション閾値として使用（固定値）
+    val collapseThreshold = with(LocalDensity.current) {
+        UserProfileCollapseThresholdDp.roundToPx()
+    }
+
+    // ── collapseFraction: 画面外アイテムが3個以下なら常に Expanded ──
+    val collapseFraction by remember {
+        derivedStateOf {
+            val layoutInfo = listState.layoutInfo
+            val visibleItems = layoutInfo.visibleItemsInfo
+            if (visibleItems.isEmpty()) return@derivedStateOf 0f
+
+            val offScreenItems = layoutInfo.totalItemsCount - visibleItems.size
+            if (offScreenItems <= 5) return@derivedStateOf 0f
+
+            val threshold = collapseThreshold.coerceAtLeast(1)
+            val firstIndex = listState.firstVisibleItemIndex
+            val firstOffset = listState.firstVisibleItemScrollOffset
+            val actualScroll = if (firstIndex == 0) {
+                firstOffset.toFloat()
+            } else {
+                val avgItemHeight =
+                    visibleItems.sumOf { it.size }.toFloat() / visibleItems.size
+                firstIndex * avgItemHeight + firstOffset
+            }
+            (actualScroll / threshold).coerceIn(0f, 1f)
+        }
+    }
+
     SystemScaffold(
         modifier = Modifier.fillMaxSize(),
         screenState = state.screenState,
@@ -89,19 +127,31 @@ private fun UserScreenContent(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .padding(paddingValues)
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .fillMaxSize(),
         ) {
-            item(key = "user_profile_header") {
-                state.user?.let { user ->
-                    UserProfile(user = user)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+            // UserProfile は LazyColumn の外に配置し、常に画面上部に固定
+            state.user?.let { user ->
+                UserProfile(
+                    user = user,
+                    collapseFraction = collapseFraction,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                )
             }
-            articleList(articlesPagingItems)
+            Divider()
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(top = 16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+            ) {
+                articleList(articlesPagingItems)
+            }
         }
     }
 }

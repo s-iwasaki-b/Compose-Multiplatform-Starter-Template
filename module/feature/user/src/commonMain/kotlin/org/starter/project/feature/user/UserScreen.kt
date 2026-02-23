@@ -131,6 +131,7 @@ private fun UserScreenContent(
                         .padding(horizontal = 16.dp),
                 )
             }
+            Spacer(modifier = Modifier.height(8.dp))
             Divider()
             Spacer(modifier = Modifier.height(8.dp))
             LazyColumn(

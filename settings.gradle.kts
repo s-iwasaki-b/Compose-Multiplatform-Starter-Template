@@ -31,6 +31,7 @@ dependencyResolutionManagement {
 
 include(":androidApp")
 include(":composeApp")
+include(":composeApp:app")
 include(":composeApp:base")
 include(":composeApp:core")
 include(":composeApp:data:zenn")

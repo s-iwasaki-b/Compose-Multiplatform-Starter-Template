@@ -1,6 +1,5 @@
 plugins {
     id("kmp-compose-library")
-    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 fun allSubProjects(action: (String) -> Unit) {

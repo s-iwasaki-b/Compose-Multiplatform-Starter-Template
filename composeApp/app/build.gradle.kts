@@ -4,10 +4,6 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
-        namespace = "$PACKAGE_NAME.compose"
-    }
-
     sourceSets {
         androidMain.dependencies {
             implementation(libs.koin.android)

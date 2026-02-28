@@ -4,7 +4,7 @@ import android.app.Application
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import org.koin.android.ext.koin.androidContext
-import org.starter.project.app.BuildConfig
+import org.starter.project.android.BuildConfig
 import org.starter.project.di.startKoin
 
 class App : Application() {

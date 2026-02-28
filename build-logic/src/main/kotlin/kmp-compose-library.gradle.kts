@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-if (project.path.startsWith(":module:")) {
+if (project.path.startsWith(":composeApp:")) {
     compose.resources {
         packageOfResClass = deriveNamespace(project) + ".resources"
         generateResClass = auto

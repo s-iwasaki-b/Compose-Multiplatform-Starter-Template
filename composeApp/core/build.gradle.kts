@@ -8,7 +8,7 @@ kotlin {
             implementation(libs.ktor.client.android)
         }
         commonMain.dependencies {
-            api(projects.module.base)
+            api(projects.composeApp.base)
             api(libs.bundles.core)
         }
         iosMain.dependencies {

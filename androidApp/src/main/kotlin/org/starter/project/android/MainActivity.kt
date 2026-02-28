@@ -1,4 +1,4 @@
-package org.starter.project.app
+package org.starter.project.android
 
 import android.content.Intent
 import android.graphics.Color

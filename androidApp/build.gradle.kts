@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "$PACKAGE_NAME.app"
+    namespace = "$PACKAGE_NAME.android"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         applicationId = PACKAGE_NAME

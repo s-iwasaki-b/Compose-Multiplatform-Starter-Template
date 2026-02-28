@@ -1,11 +1,10 @@
 plugins {
     id("kmp-compose-library")
-    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
-fun allSubProjects(rootDir: File, action: (String) -> Unit) {
-    rootDir.resolve("module").walk().maxDepth(3).filter {
-        it.isDirectory && it.resolve("build.gradle.kts").exists()
+fun allSubProjects(action: (String) -> Unit) {
+    projectDir.walk().maxDepth(3).filter {
+        it != projectDir && it.isDirectory && it.resolve("build.gradle.kts").exists()
     }.forEach {
         val path = it.relativeTo(rootDir).path.replace(File.separator, ":")
         action(path)
@@ -18,7 +17,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            allSubProjects(rootDir) { export(project(":$it")) }
+            allSubProjects { export(project(":$it")) }
 
             baseName = "ComposeApp"
             isStatic = true
@@ -27,7 +26,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            allSubProjects(rootDir) { api(project(":$it")) }
+            allSubProjects { api(project(":$it")) }
         }
     }
 }

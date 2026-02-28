@@ -15,9 +15,9 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.bundles.data)
 
-            api(projects.module.base)
-            implementation(projects.module.core)
-            implementation(projects.module.data.repository)
+            api(projects.composeApp.base)
+            implementation(projects.composeApp.core)
+            implementation(projects.composeApp.data.repository)
         }
         commonTest.dependencies {
             implementation(libs.bundles.test)

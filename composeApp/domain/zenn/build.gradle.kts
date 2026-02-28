@@ -8,9 +8,9 @@ kotlin {
         commonMain.dependencies {
             implementation(libs.bundles.domain)
 
-            api(projects.module.base)
-            implementation(projects.module.data.repository)
-            implementation(projects.module.domain.service)
+            api(projects.composeApp.base)
+            implementation(projects.composeApp.data.repository)
+            implementation(projects.composeApp.domain.service)
         }
         commonTest.dependencies {
             implementation(libs.bundles.test)

@@ -11,8 +11,8 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(projects.module.ui)
-            implementation(projects.module.domain.service)
+            api(projects.composeApp.ui)
+            implementation(projects.composeApp.domain.service)
             implementation(libs.compose.components.resources)
         }
     }

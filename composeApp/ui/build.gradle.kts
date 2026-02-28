@@ -23,7 +23,7 @@ kotlin {
             api(libs.androidx.lifecycle.runtime.compose)
             api(libs.androidx.navigation.compose)
 
-            api(projects.module.base)
+            api(projects.composeApp.base)
             api(libs.bundles.ui)
         }
     }

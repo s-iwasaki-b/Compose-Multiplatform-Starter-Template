@@ -16,6 +16,11 @@ import org.starter.project.data.zenn.repository.ZennRepositoryImpl
 import org.starter.project.domain.service.ResultHandler
 import org.starter.project.domain.service.ZennService
 import org.starter.project.domain.zenn.ZennServiceImpl
+import org.starter.project.domain.ai.AgentFactory
+import org.starter.project.domain.ai.action.AppActionDispatcher
+import org.starter.project.domain.ai.provider.LlmProvider
+import org.starter.project.domain.ai.provider.OpenAIProvider
+import org.starter.project.feature.chat.ChatScreenViewModel
 import org.starter.project.feature.home.HomeScreenViewModel
 import org.starter.project.feature.user.UserScreenViewModel
 
@@ -44,7 +49,14 @@ fun startKoin(platformDeclaration: KoinAppDeclaration? = null) {
             single<ZennService> { ZennServiceImpl(get(), get()) }
         }
 
+        val aiModule = module {
+            single { AppActionDispatcher() }
+            single<LlmProvider> { OpenAIProvider() }
+            single { AgentFactory(get()) }
+        }
+
         val appModule = module {
+            viewModelOf(::ChatScreenViewModel)
             viewModelOf(::HomeScreenViewModel)
             viewModelOf(::UserScreenViewModel)
         }
@@ -55,6 +67,7 @@ fun startKoin(platformDeclaration: KoinAppDeclaration? = null) {
             dataSourceModule,
             repositoryModule,
             serviceModule,
+            aiModule,
             appModule
         )
     }

@@ -42,7 +42,7 @@ macOS標準には `timeout` コマンドが無い。**すべての `xcrun simctl
 |------|----------|
 | `simctl boot` | 90 |
 | `simctl bootstatus` | 120 |
-| `simctl install` | 90 |
+| `simctl install` | 180 |
 | `simctl launch` | 45 |
 | `simctl io ... screenshot` | 30 |
 | `simctl spawn ... log` | 60 |

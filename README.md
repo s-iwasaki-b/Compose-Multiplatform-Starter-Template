@@ -48,42 +48,18 @@ Finally run gradle sync and restart Android Studio before building.
 
 
 # iOS Integration
+The iOS app links the static Kotlin/Native framework `ComposeApp.framework` built from the `composeApp:app` module. Xcode builds and embeds it through the Run Script phase `./gradlew :composeApp:app:embedAndSignAppleFrameworkForXcode`, and Framework Search Paths point to `composeApp/app/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`.
 
-### Direct Integration
-The iOS app consumes a static Kotlin/Native framework, `ComposeApp.framework`, generated from the `composeApp:app` module (Direct Integration). Xcode embeds it via the Run Script phase `./gradlew :composeApp:app:embedAndSignAppleFrameworkForXcode`, with Framework Search Paths set to `composeApp/app/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`.
+Swift uses three Kotlin APIs from `composeApp:app`: `MainViewController()`, `DeepLinkHandler`, and `initNapier()` (exposed as `doInitNapier()` through ObjC interop).
 
-Swift consumes three Kotlin APIs exposed by `composeApp:app`: `MainViewController()`, `DeepLinkHandler`, and `initNapier()` (renamed to `doInitNapier()` when called from Swift via ObjC interop).
-
-To check the framework output locally, run:
+To build the framework locally, run:
 ```
 ./gradlew :composeApp:app:linkDebugFrameworkIosSimulatorArm64
 ```
 
-### Swift Export (Evaluation, 2026-09-20)
-Since Kotlin 2.4.0, [Swift Export](https://kotlinlang.org/docs/native-swift-export.html) is Alpha, and the official docs state that breaking changes are expected. The Direct Integration approach described above is this template's current, unaffected default.
-
-Verification results:
-- Adding `swiftExport { moduleName = "ComposeApp"; flattenPackage = "org.starter.project" }` to `composeApp:app` generated Swift APIs for `MainViewController()` (returning `UIViewController`), `DeepLinkHandler` (`shared` / `listener` / `onNewUri(uri:)`), and `initNapier()` (no rename). `@Composable fun Main()` was excluded without warning.
-- However, `embedSwiftExportForXcode` fails at Compose Multiplatform 1.12.0's Compose Resources sync task (`syncSwiftExportBinaryComposeResourcesForIos`, whose `outputDir` is unset), so the build never reaches `.swiftmodule` / `.a`. Excluding resource sync breaks string resources at runtime, so switching to Swift Export in production is not currently possible.
-
-Decision: **Postponed**. Reconsider when either (a) Swift Export reaches Beta or later, or (b) Compose Multiplatform fixes resource sync for Swift Export builds. Migration steps once adopted:
-- Add `swiftExport {}` to the `composeApp:app` Gradle build.
-- Change the Xcode Run Script phase to `embedSwiftExportForXcode`.
-- Change the Swift-side call from `NapierProxyKt.doInitNapier()` to `initNapier()`.
-
 
 # Navigation
-This template uses [`org.jetbrains.androidx.navigation:navigation-compose`](https://developer.android.com/jetpack/androidx/releases/navigation) 2.9.2, the latest stable KMP release, with type-safe routes, deep links via `navDeepLink` + `NavUri`, and screen-scoped ViewModels via `koinViewModel`.
-
-Evaluation summary (2026-09-20):
-
-| Option | Notes |
-|:--|:--|
-| Navigation 2 (adopted) | Google's original library is in maintenance mode. The next KMP release, 2.10.0, is beta: `handleDeepLink` will ignore unrecognized deep links (breaking change), a predictive-back pop-transition parameter is added, and minSdk rises to 24. Compose Multiplatform 1.12 bundles 2.10.0-alpha02. |
-| NavigationEvent 1.1.0 | `PredictiveBackHandler` is deprecated in favor of `NavigationBackHandler`. This template does not use `BackHandler`. |
-| [Navigation 3](https://kotlinlang.org/docs/multiplatform/compose-navigation-3.html) (KMP) | 1.1.1 is stable and production-ready. The app owns its own back stack and renders it with `NavDisplay` + `entryProvider`. Built-in deep link support only lands in 1.2.0-alpha03 and later. Koin support exists via `koin-compose-navigation3`, but ViewModel clearing has an open issue ([InsertKoinIO/koin#2235](https://github.com/InsertKoinIO/koin/issues/2235)). The official guidance describes migrating from Navigation 2 as a rewrite. |
-
-Decision: **Stay on Navigation 2 (2.9.2)**. Reconsider once Navigation 3's built-in deep link support (the 1.2.0 line) reaches stable.
+Navigation uses [`org.jetbrains.androidx.navigation:navigation-compose`](https://developer.android.com/jetpack/androidx/releases/navigation) 2.9.2 with type-safe routes, deep links via `navDeepLink` and `NavUri`, and screen-scoped ViewModels via `koinViewModel`.
 
 
 # 3rd Party Dependencies

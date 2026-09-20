@@ -20,7 +20,8 @@ allowed-tools:
 | パッケージ名/Bundle ID | `org.starter.project` | `org.starter.project.StarterProject` |
 | アプリモジュール | `androidApp` | `iosApp/iosApp.xcodeproj` |
 | Gradleタスク/スキーム | `:androidApp:installDebug` | `iosApp` |
-| Activity/起動コマンド | `org.starter.project/.app.MainActivity` | `xcrun simctl launch <uuid> org.starter.project.StarterProject` |
+| Activity/起動コマンド | `org.starter.project/.android.MainActivity` | `xcrun simctl launch <uuid> org.starter.project.StarterProject` |
+| Gradleは直列で1つだけ | Android → iOSの順（詳細はステップ2） | 同左 |
 
 ## 実行手順
 
@@ -49,12 +50,14 @@ adb devices 2>/dev/null | grep -E "device$|emulator"
 
 1. 未起動のプラットフォームについて、利用可能なデバイス一覧を取得:
    - iOS: `xcrun simctl list devices available | grep -E "iPhone|iPad"`
-   - Android: `emulator -list-avds 2>/dev/null`
+   - Android: `emulator -list-avds 2>/dev/null`（`emulator` コマンドがPATHに無い環境があるため、見つからない場合は `$ANDROID_HOME/emulator/emulator -list-avds` → `~/Library/Android/sdk/emulator/emulator -list-avds` の順にフォールバックする）
 2. `AskUserQuestion` で未起動のシミュレーター/エミュレーターを起動するか確認し、起動する場合はデバイスを選択してもらう
 3. 選択されたデバイスを起動:
    - iOS: `xcrun simctl boot <simulator-uuid> && open -a Simulator`
-   - Android: `emulator -avd <avd-name> -no-snapshot-load &` → `adb wait-for-device shell getprop sys.boot_completed | grep -m 1 '1'`
-4. 起動完了を待ってからステップ1へ進む
+   - Android: `emulator -avd <avd-name> -no-snapshot-load &`（`emulator` コマンドの探索順は上記と同じフォールバックに従う）
+4. 起動完了を待ってからステップ1へ進む（**待機は必ず起動待ちコマンドで確認する**）:
+   - iOS: `xcrun simctl bootstatus <simulator-uuid> -b`
+   - Android: `adb wait-for-device shell 'while [ "$(getprop sys.boot_completed)" != "1" ]; do sleep 2; done'`
 
 **利用可能なデバイスが0件の場合**: 該当プラットフォームはスキップ
 
@@ -64,9 +67,9 @@ adb devices 2>/dev/null | grep -E "device$|emulator"
 
 - `$ARGUMENTS` が "android" → Androidのみ実行
 - `$ARGUMENTS` が "ios" → iOSのみ実行
-- `$ARGUMENTS` が空または上記以外 → 両方を並列実行
+- `$ARGUMENTS` が空または上記以外 → 両方を直列実行（Android → iOSの順）
 
-### 2. プラットフォーム別スキルを並列実行
+### 2. プラットフォーム別スキルを直列実行
 
 **重要**: 各スキルを呼び出す前に、環境変数 `CALLED_FROM_DEBUG_RUN=true` を設定する。
 これにより、サブスキルはJSON形式のみで出力し、マークダウン出力を行わない。
@@ -89,22 +92,22 @@ export CALLED_FROM_DEBUG_RUN=true
 debug-run-ios
 ```
 
-**両方の場合（並列実行）**:
+**両方の場合（Android → iOSの順に直列実行）**:
 ```bash
 export CALLED_FROM_DEBUG_RUN=true
 ```
-その後、以下を**並列**で実行:
+まず `debug-run-android` を実行し、完了を待ってから `debug-run-ios` を実行する:
 ```
 debug-run-android
 ```
-と
+完了後:
 ```
 debug-run-ios
 ```
 
 **重要**:
-- 両プラットフォームを実行する場合は、完全に並列で実行する
-- 一方の完了を待たずに、もう一方も同時に実行する
+- 両プラットフォームを実行する場合は、**必ずAndroid → iOSの順で直列実行する（並列実行は行わない）**
+- **理由**: 同じプロジェクトディレクトリでGradleが2本同時に走ると、`build/` 配下の中間生成物（KLIBメタデータ変換など）を壊し合い、実際には問題が無いのに偽の `BUILD FAILED` が発生する。iOS側の `xcodebuild` もRun Script内で `./gradlew :composeApp:app:embedAndSignAppleFrameworkForXcode` を呼び出すため、これもGradle実行に含まれる
 - 各スキルは独立して動作し、それぞれJSON形式で結果を返す
 - マークダウン出力はこのスキル（debug-run）でのみ行う
 
@@ -117,10 +120,10 @@ debug-run-ios
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | <device-name> | Success/Failed | Success/Failed/N/A | <XX>s |
-| iOS      | <simulator-name> | Success/Failed | Success/Failed/N/A | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | <device-name> | Success/Failed | Success/Failed/N/A | OK/Error/N/A | <XX>s |
+| iOS      | <simulator-name> | Success/Failed | Success/Failed/N/A | OK/Error/N/A | <XX>s |
 ```
 
 **フォーマット詳細**:
@@ -128,6 +131,7 @@ debug-run-ios
 - **Device**: デバイス/シミュレーター名
 - **Build**: `Success` または `Failed`
 - **Launch**: `Success`、`Failed`、または `N/A` (ビルド失敗時)
+- **Loading**: 起動後に撮影したスクリーンショットを目視確認した結果。`OK`（正常な画面表示）、`Error`（エラー画面/クラッシュ画面）、`N/A`（Launch失敗などで未撮影）
 - **Build Time**: ビルドにかかった秒数
 
 ### 4. エラーサマリーの出力
@@ -184,10 +188,10 @@ debug-run-ios
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | Pixel 5 API 34 | Success | Success | 38s |
-| iOS      | iPhone 15 Pro | Success | Success | 58s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | Pixel 5 API 34 | Success | Success | OK | 38s |
+| iOS      | iPhone 15 Pro | Success | Success | OK | 58s |
 ```
 
 ### 例2: Androidビルド失敗、iOS成功
@@ -195,10 +199,10 @@ debug-run-ios
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | Pixel 5 API 34 | Failed | N/A | 12s |
-| iOS      | iPhone 15 Pro | Success | Success | 58s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | Pixel 5 API 34 | Failed | N/A | N/A | 12s |
+| iOS      | iPhone 15 Pro | Success | Success | OK | 58s |
 
 ### Android Build Error
 
@@ -220,10 +224,10 @@ debug-run-ios
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | Pixel 5 API 34 | Success | Failed | 42s |
-| iOS      | iPhone 15 Pro | Success | Success | 58s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | Pixel 5 API 34 | Success | Failed | Error | 42s |
+| iOS      | iPhone 15 Pro | Success | Success | OK | 58s |
 
 ### Android Launch Failed: Runtime Error
 
@@ -235,7 +239,7 @@ debug-run-ios
 
 **Stack trace**:
 ```
-at org.starter.project.app.MainActivity.onCreate(MainActivity.kt:25)
+at org.starter.project.android.MainActivity.onCreate(MainActivity.kt:25)
 at android.app.Activity.performCreate(Activity.java:8000)
 at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3785)
 ```
@@ -243,7 +247,7 @@ at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3785)
 **Likely cause**: `database` プロパティが初期化される前にアクセスされています
 
 **Suggested fix**:
-- [MainActivity.kt:25](androidApp/src/main/kotlin/org/starter/project/app/MainActivity.kt#L25) で `database` プロパティを使用する前に初期化してください
+- [MainActivity.kt:25](androidApp/src/main/kotlin/org/starter/project/android/MainActivity.kt#L25) で `database` プロパティを使用する前に初期化してください
 - `::database.isInitialized` チェックを追加することを検討してください
 ```
 

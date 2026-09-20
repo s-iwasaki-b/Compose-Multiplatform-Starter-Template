@@ -1,5 +1,4 @@
 import org.gradle.api.artifacts.VersionCatalogsExtension
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -10,12 +9,13 @@ plugins {
 val libs = the<VersionCatalogsExtension>().named("libs")
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = deriveNamespace(project)
         compileSdk = libs.findVersion("android-compileSdk").get().toString().toInt()
         minSdk = libs.findVersion("android-minSdk").get().toString().toInt()
 
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        withHostTestBuilder {}
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }

@@ -6,10 +6,6 @@ plugins {
     alias(libs.plugins.mokkery)
 }
 
-ktorfit {
-    compilerPluginVersion.set("2.3.3")
-}
-
 kotlin {
     sourceSets {
         commonMain.dependencies {

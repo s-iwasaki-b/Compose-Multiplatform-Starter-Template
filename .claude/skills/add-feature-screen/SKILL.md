@@ -42,4 +42,5 @@ description: Add a new screen to the app as a feature module or a sub-package of
 - テスト実行: `./gradlew :composeApp:feature:<feature>:testAndroidHostTest`（リポジトリ全体は `./gradlew testAndroidHostTest`）。
 - 実機/シミュレータ確認: `.claude/skills/debug-run/skill.md`（DeepLink の `basePath` を設定した場合は起動確認も行う）。
 - Koin 起動確認: 画面遷移時に `NoDefinitionFoundException` が出ないこと。
+- PR 分割: `ui` の Route 追加（契約）→ feature 実装 → `app` 統合（Koin/NavHost/依存）の段階ごとに Stacked PR で起票する（後続 PR の base は先行ブランチ。→ AGENTS.md 作業ルール、docs/coding-guide.md §6）。
 - PR 前チェック: 依存方向（feature は `domain:service` と `ui` のみ）、Route の引数がプリミティブ型のみであること、テスト必須範囲を満たしていることを確認する（→ docs/coding-guide.md §6）。

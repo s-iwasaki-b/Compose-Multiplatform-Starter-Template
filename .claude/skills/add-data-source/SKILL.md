@@ -55,4 +55,5 @@ description: Add a new external data source (API or local-settings-backed resour
 
 - テスト実行: `./gradlew :composeApp:data:<source>:testAndroidHostTest` と `./gradlew :composeApp:domain:<name>:testAndroidHostTest`。
 - Koin 登録漏れ確認: 新しい Service を使う画面に遷移し `NoDefinitionFoundException` が出ないこと（[add-feature-screen](../add-feature-screen/SKILL.md) 実施後）。実機/シミュレータ確認は `.claude/skills/debug-run/skill.md`。
+- PR 分割: 契約（`base` モデル / `data:repository` / `domain:service`）→ 実装（`data/<source>`, `domain/<name>`）→ `app` 登録 の段階ごとに Stacked PR で起票する（後続 PR の base は先行ブランチ。→ AGENTS.md 作業ルール、docs/coding-guide.md §6）。
 - PR 前チェック: 実装モジュール同士が直接依存していないこと、Repository が例外透過であること、DTO が全 nullable であることを確認する（→ docs/coding-guide.md §6）。

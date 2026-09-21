@@ -32,6 +32,7 @@
 - **必須** ログは Napier のみを使う。`println`・`android.util.Log` は使わない。例外捕捉は `Napier.e`、ライフサイクル等の追跡は `Napier.d`、通信詳細は `Napier.v` を使う。
 - **必須** 設定値は `internal object XxxConfig { const val ... }` に集約する。シークレット（API キー等）をクライアントに平文で埋め込まない。
 - **必須** Compose Resources のリソースファイル名は `string.xml`（`strings.xml` ではない）。
+- **必須** コードコメントは why（意図・制約・経緯）だけを書く。コードを読めば分かる what / how のコメントは書かず、コードを読んでも分からない暗黙知（外部 API の仕様上の制約、回避策の理由、あえて採らなかった実装など）を明文化する用途に限る。例外は次の TODO と、§5 のテストの `// arrange` `// act` `// assert` 区切り。
 - **必須** TODO コメントは `// TODO: <何をすべきか>` の形式で、英語で書く。
 - 本文・コメントは日本語で構わないが、識別子・ファイル名・コード・コミットメッセージは英語で書く。
 
@@ -217,6 +218,8 @@ fun fetchXxx_success_returnsXxx() = runTest(testDispatcher) {
 - **必須** `main` ブランチへ直接コミットしない。必ずブランチを切り、PR 経由でマージする。
 - **必須**（AI 作業） ブランチ名は `claude/<kebab-case-summary>` にする。
 - **必須** PR タイトルはコミットメッセージと同じ形式にする。PR 本文は `## Summary`（箇条書き）/`## Verification`（実施した検証）で構成し、意図的に対応しなかった箇所は `## Intentionally left as-is` に書く。末尾に生成ツールフッターを付ける。
+- **必須** PR は可能な限り小さく、1 PR = 1 つの目的、他の PR を読まなくてもレビューできる（コンテキストが閉じた）粒度にする。**推奨**（新規決定） 目安は変更モジュール 1〜2 個・差分 300 行以内。超えるなら分割を検討する。
+- **必須** 依存関係のある連続した変更は GitHub の Stacked PR で分割する。手順: (1) 先行ブランチから後続ブランチを切る (2) `gh pr create --base <先行ブランチ>` で起票する (3) PR 本文冒頭に `Stack n/N: #A → #B → #C` を書く (4) 先行 PR のマージ後、後続 PR の base が `main` になっていることを確認し（切り替わっていなければ `gh pr edit <番号> --base main`）、`git rebase origin/main` する。例: データソース追加は 契約（`base`/`data:repository`/`domain:service`）→ 実装（`data/<source>`, `domain/<name>`）→ `app` 登録 の 3 段。
 - **推奨**（新規決定） 同一ワークツリーに別セッション/別ブランチの未コミット変更がある状態で新しい作業を始める場合は `git worktree add -b <branch> .claude/worktrees/<name> main` で隔離する。`git stash` は全セッション/全ワークツリーで共有されるため使わない。
 - **必須** 依存ライブラリの更新は安定版を優先する（→ decisions.md D-07）。更新コミットは scope=`deps`/`gradle` の実例形式に合わせる。
 
@@ -249,6 +252,7 @@ EOF
 - **必須** 変更・追加した Converter/Repository 実装/Service 実装/ViewModel にテストがあり、`./gradlew testAndroidHostTest` がローカルで通ることを確認する。
 - **必須** 8節の既知の逸脱を新規コードにコピーしていないか確認する。
 - **必須** ガイド・`decisions.md` と矛盾する変更をした場合、同じ PR でドキュメントも更新する。
+- **必須** UI を変更した場合、修正箇所ごとに before / after のスクリーンショットを表形式（修正箇所 | Before | After）で PR 本文の `## Verification` に添付する（手順は `.claude/skills/capture-screenshots`）。
 
 ## 7. 手順（skills）
 
@@ -259,6 +263,7 @@ EOF
 | `add-feature-screen` | 新しい画面と feature モジュールを追加する | `feature/<name>`, `ui`, `app` |
 | `add-data-source` | 新しい API/Preferences のデータソースと Repository/Service を追加する | `data/<source>`, `data/repository`, `domain/<name>`, `domain/service`, `app` |
 | `remove-sample-code` | Zenn サンプル実装を削除して雛形化する | `data/zenn`, `domain/zenn`, `feature/home`, `feature/user` |
+| `capture-screenshots` | UI 変更の before / after スクリーンショットを取得し、PR 本文用の比較表を作る | `feature/<name>`, `ui`（成果物は PR 本文） |
 
 ## 8. 既知の逸脱
 

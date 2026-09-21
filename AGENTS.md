@@ -14,6 +14,7 @@
 8. テストダブルは Mokkery に統一する。手書き Fake クラスやテスト専用 Fake モジュールは作らない（→ [docs/decisions.md](docs/decisions.md) D-06）。
 9. テストの必須範囲は Converter / Repository 実装 / Service 実装 / ViewModel（→ [docs/decisions.md](docs/decisions.md) D-17）。
 10. コミットは Conventional Commits 形式（`<type>(<scope>): <Subject>`）、`main` に直接コミットしない（→ [docs/coding-guide.md](docs/coding-guide.md) §6）。
+11. コードコメントは why（意図・制約・経緯）だけを書く。コードを読めば分かる what / how は書かず、コードを読んでも分からない暗黙知を明文化する用途に限る。例外は `// TODO:` とテストの `// arrange` `// act` `// assert` 区切り（→ [docs/coding-guide.md](docs/coding-guide.md) §1）。
 
 ## 実行体制（オーケストレーション）
 
@@ -67,13 +68,17 @@ docs/                design-guide / coding-guide / decisions（読み物）
 | 依存ライブラリを更新する | なし | [decisions.md](docs/decisions.md) D-07 | 変更対象モジュール |
 | サンプルコードを削除する | [remove-sample-code](.claude/skills/remove-sample-code/SKILL.md) | — | SKILL.md 参照（実質全モジュール） |
 | 動作確認する | `.claude/skills/debug-run`（`debug-run-android`/`debug-run-ios`） | — | `app` |
+| UI 変更の PR を出す | [capture-screenshots](.claude/skills/capture-screenshots/SKILL.md) | [coding-guide.md](docs/coding-guide.md) §6 | `feature/<name>`, `ui` |
 | PR を出す | なし | [coding-guide.md](docs/coding-guide.md) §6 | — |
 
 ## 作業ルール
 
 - 並行セッション対応: 同一ワークツリーで別セッション/別ブランチの未コミット変更がある状態でブランチ作業をするときは `git worktree` で隔離する。`git stash` は全セッションで共有されるため使わない。
 - コミットは Conventional Commits 形式、ブランチ名は `claude/<kebab-case>`。
+- PR は可能な限り小さく、1 PR = 1 つの目的で、他の PR を読まなくてもレビューできる（コンテキストが閉じた）粒度で起票する。
+- 依存関係のある連続した変更（契約 → 実装 → 画面 など）は 1 つの PR にまとめず、GitHub の Stacked PR として分割する。後続 PR は先行 PR の head ブランチを base にして起票し（`gh pr create --base <先行ブランチ>`）、本文冒頭に stack の順序（例: `Stack 2/3: #12 → #13 → #14`）を書く。先行 PR のマージ後は後続 PR の base が `main` になっていることを確認する（→ [docs/coding-guide.md](docs/coding-guide.md) §6）。
 - PR 本文は `## Summary` / `## Verification` / `## Intentionally left as-is` の構成にする。
+- UI を変更した PR は、修正箇所ごとに before / after のスクリーンショットを表形式（修正箇所 | Before | After）で `## Verification` に添付する。取得と添付の手順は [capture-screenshots](.claude/skills/capture-screenshots/SKILL.md)。
 - 削除は `git rm`/`rm` の前に対象一覧を提示し、明示的な確認を得てから実行する。
 - 規約を変更する場合は、同じ PR で該当する docs（[docs/design-guide.md](docs/design-guide.md)、[docs/coding-guide.md](docs/coding-guide.md)、[docs/decisions.md](docs/decisions.md)）とモジュール `AGENTS.md` を更新する。
 - 新規コードに [docs/coding-guide.md](docs/coding-guide.md) §8 の既知の逸脱を複製しない（PR 前チェックで確認）。

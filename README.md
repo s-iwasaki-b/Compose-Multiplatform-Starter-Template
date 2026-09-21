@@ -47,6 +47,15 @@ Finally run gradle sync and restart Android Studio before building.
 ![Compose Multiplatform Starter Repository Architecture](https://github.com/user-attachments/assets/90445e4b-ceda-47d3-a21b-b2461c7e3eab)
 
 
+# Documentation
+This repository is documented for AI coding agents in three layers, written in Japanese so agents and human developers reproduce the same design decisions even after the sample code below is removed.
+
+- [`AGENTS.md`](AGENTS.md) — repository entry point: 10 non-negotiable rules, the orchestrator/implementer workflow, a module map, and a task-based reading list. [`CLAUDE.md`](CLAUDE.md) just imports it for Claude Code.
+- [`docs/design-guide.md`](docs/design-guide.md), [`docs/coding-guide.md`](docs/coding-guide.md), [`docs/decisions.md`](docs/decisions.md) — the three reference docs: architecture/layering, per-layer implementation conventions, and the decision log behind each convention.
+- `composeApp/<layer>/<name>/AGENTS.md` — a per-module implementation guide (responsibilities, dependencies, code patterns, tests) for each of the 10 modules; an implementation agent reads its module's file first.
+- [`.claude/skills/`](.claude/skills/) — step-by-step procedures (e.g. `add-feature-screen`, `add-data-source`, `remove-sample-code`) for the orchestrator to follow and delegate from.
+
+
 # iOS Integration
 The iOS app links the static Kotlin/Native framework `ComposeApp.framework` built from the `composeApp:app` module. Xcode builds and embeds it through the Run Script phase `./gradlew :composeApp:app:embedAndSignAppleFrameworkForXcode`, and Framework Search Paths point to `composeApp/app/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`.
 

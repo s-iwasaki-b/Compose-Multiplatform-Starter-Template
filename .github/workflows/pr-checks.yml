@@ -1,0 +1,118 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PR本文・タイトル・差分を検証する
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          fail=0
+
+          # PRタイトル・本文・baseブランチ・差分行数は gh pr view から取得する。
+          # 本文・タイトルはコマンド引数へ直接展開せず、JSONファイル経由でのみ扱う
+          # （PR本文に含まれ得る任意の文字列をシェルコマンドとして評価しないため）。
+          gh pr view "$PR_NUMBER" --repo "$REPO" \
+            --json title,body,baseRefName,additions,deletions > pr.json
+
+          title=$(jq -r '.title' pr.json)
+          body=$(jq -r '.body // ""' pr.json | tr -d '\r')
+          base_ref=$(jq -r '.baseRefName' pr.json)
+          additions=$(jq -r '.additions' pr.json)
+          deletions=$(jq -r '.deletions' pr.json)
+
+          echo "PR #$PR_NUMBER: base=$base_ref additions=$additions deletions=$deletions"
+          echo "title: $title"
+
+          # PULL_REQUEST_TEMPLATE.md の案内・記入例は HTML コメント（複数行にまたがるものを含む）
+          # として書かれているため、内容判定（検査A/B/D の表判定）はコメントを除去した本文で行う。
+          # これによりテンプレートの記入例をそのまま残したPRが誤って検査を通過しないようにする。
+          # opt-out マーカー (<!-- no-ui-change -->) はコメント自体が印なので、除去前の生本文で検出する。
+          body_stripped=$(printf '%s' "$body" | python3 -c 'import re, sys; sys.stdout.write(re.sub(r"<!--.*?-->", "", sys.stdin.read(), flags=re.DOTALL))')
+
+          cc_regex='^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9., -]+\))?!?: [A-Z]'
+
+          # --- 検査A: PR本文に必須セクションがあるか ---
+          if ! grep -qE '^##[[:space:]]+Summary[[:space:]]*$' <<<"$body_stripped"; then
+            fail=1
+            echo "::error::[検査A] PR本文に見出し \"## Summary\" がありません。.github/PULL_REQUEST_TEMPLATE.md を元に本文を作成してください。"
+          fi
+          if ! grep -qE '^##[[:space:]]+Verification[[:space:]]*$' <<<"$body_stripped"; then
+            fail=1
+            echo "::error::[検査A] PR本文に見出し \"## Verification\" がありません。.github/PULL_REQUEST_TEMPLATE.md を元に本文を作成してください。"
+          fi
+
+          # --- 検査B: base が main 以外なら Stacked PR の記載が必須 ---
+          if [[ "$base_ref" != "main" ]]; then
+            if ! grep -qE '^Stack [0-9]+/[0-9]+:' <<<"$body_stripped"; then
+              fail=1
+              echo "::error::[検査B] base ブランチが main 以外 ($base_ref) です。Stacked PR の場合は本文冒頭に \"Stack n/N: #A → #B\" の形式（n, N, A, B は実際の数字・PR番号）で1行追加してください。"
+            fi
+          fi
+
+          # --- 検査C: Conventional Commits（PRタイトル） ---
+          if ! grep -qE "$cc_regex" <<<"$title"; then
+            fail=1
+            echo "::error::[検査C] PRタイトルが Conventional Commits 形式（例: feat(scope): Subject）ではありません: $title"
+          fi
+
+          # --- 検査C: Conventional Commits（各コミットのsubject。マージコミットは除外） ---
+          commit_subjects=$(gh api "repos/$REPO/pulls/$PR_NUMBER/commits" --paginate --jq '.[].commit.message | split("\n")[0]')
+          while IFS= read -r subject; do
+            [[ -z "$subject" ]] && continue
+            [[ "$subject" =~ ^Merge\  ]] && continue
+            if ! [[ "$subject" =~ $cc_regex ]]; then
+              fail=1
+              echo "::error::[検査C] コミットメッセージが Conventional Commits 形式ではありません: $subject"
+            fi
+          done <<<"$commit_subjects"
+
+          # --- 検査D: UI変更を含む場合は Before/After 表（またはopt-out）が必須 ---
+          changed_files=$(gh api "repos/$REPO/pulls/$PR_NUMBER/files" --paginate --jq '.[].filename')
+          ui_files=""
+          if [[ -n "$changed_files" ]]; then
+            ui_files_feature=$(printf '%s\n' "$changed_files" \
+              | grep -E '^composeApp/feature/[^/]+/src/commonMain/.*\.kt$' \
+              | grep -Ev '(ViewModel|State|Event|EventHandler)\.kt$' || true)
+            ui_files_ui=$(printf '%s\n' "$changed_files" \
+              | grep -E '^composeApp/ui/src/commonMain/.*\.kt$' \
+              | grep -Ev '/(route|throwable)/' || true)
+            ui_files=$(printf '%s\n%s\n' "$ui_files_feature" "$ui_files_ui" | grep -v '^$' || true)
+          fi
+
+          if [[ -n "$ui_files" ]]; then
+            if grep -qF '<!-- no-ui-change -->' <<<"$body"; then
+              echo "[検査D] UI変更ファイルを検出しましたが、opt-outコメント (<!-- no-ui-change -->) があるためスキップします。"
+            elif ! grep -qE '\|[[:space:]]*Before[[:space:]]*\|[[:space:]]*After[[:space:]]*\|' <<<"$body_stripped"; then
+              fail=1
+              echo "::error::[検査D] UI変更を検出しましたが、PR本文の ## Verification に Before/After のスクリーンショット表（| 修正箇所 | Before | After |）がありません。誤検知の場合は本文のどこかに <!-- no-ui-change --> を追加し、理由を ## Intentionally left as-is に書いてください。"
+              echo "::error::[検査D] 検出したUI変更ファイル:"
+              printf '%s\n' "$ui_files" | sed 's/^/::error::   - /'
+            fi
+          fi
+
+          # --- 検査E: 差分行数の警告（failしない） ---
+          total_diff=$((additions + deletions))
+          if (( total_diff > 300 )); then
+            echo "::warning::[検査E] 差分が ${total_diff} 行（追加 ${additions} / 削除 ${deletions}）と300行を超えています。変更モジュール1〜2個・差分300行以内が推奨です。分割を検討してください。"
+          fi
+
+          if [[ "$fail" -eq 1 ]]; then
+            echo "PRチェックに失敗した項目があります。上記の ::error:: を確認してください。"
+            exit 1
+          fi
+
+          echo "PRチェックはすべて合格しました。"

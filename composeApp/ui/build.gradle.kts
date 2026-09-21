@@ -4,7 +4,7 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         androidResources {
             enable = true
         }
@@ -15,10 +15,10 @@ kotlin {
             api(libs.compose.runtime)
             api(libs.compose.foundation)
             api(libs.compose.material)
-            api(compose.materialIconsExtended)
+            api(libs.compose.material.icons.extended)
             api(libs.compose.ui)
             api(libs.compose.components.resources)
-            api(libs.compose.components.ui.tooling.preview)
+            api(libs.compose.ui.tooling.preview)
             api(libs.androidx.lifecycle.viewmodel.compose)
             api(libs.androidx.lifecycle.runtime.compose)
             api(libs.androidx.navigation.compose)

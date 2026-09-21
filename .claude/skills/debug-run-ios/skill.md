@@ -17,12 +17,37 @@ allowed-tools:
 - **Xcodeプロジェクト**: `iosApp/iosApp.xcodeproj`
 - **スキーム**: `iosApp`
 - **アプリ名**: `StarterProject`
+- **Run Scriptが呼ぶGradleタスク**: `:composeApp:app:embedAndSignAppleFrameworkForXcode`（`iosApp` ターゲットのビルドフェーズから `./gradlew` 経由で呼ばれる。Gradleは直列で1つだけ実行する）
+- **フレームワーク出力パス**: `composeApp/app/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`
+- **フレームワーク単体確認**: `./gradlew :composeApp:app:linkDebugFrameworkIosSimulatorArm64`
 
 ## 前提条件
 
 - macOS環境
 - Xcode がインストールされている
 - `xcrun` および `xcodebuild` コマンドが利用可能
+
+## タイムアウト方針
+
+macOS標準には `timeout` コマンドが無い。**すべての `xcrun simctl` 呼び出しにタイムアウトを付ける**ため、次のいずれかを使う:
+
+- `perl -e 'alarm <秒>; exec @ARGV' xcrun simctl ...`
+- `gtimeout <秒> xcrun simctl ...`（Homebrewの`coreutils`導入済みの場合のみ利用可能）
+
+**exit code 142 はタイムアウト（SIGALRMによる終了）と解釈する。**
+
+推奨タイムアウト秒数:
+
+| 操作 | 推奨秒数 |
+|------|----------|
+| `simctl boot` | 90 |
+| `simctl bootstatus` | 120 |
+| `simctl install` | 180 |
+| `simctl launch` | 45 |
+| `simctl io ... screenshot` | 30 |
+| `simctl spawn ... log` | 60 |
+
+上記以外の軽量な参照系コマンド（`simctl list` など）にも同様にタイムアウトを付ける。
 
 ## 実行手順
 
@@ -37,7 +62,7 @@ allowed-tools:
 ### 1. 起動中のシミュレーターを検出
 
 ```bash
-xcrun simctl list devices booted 2>/dev/null | grep -E "iPhone|iPad"
+perl -e 'alarm 30; exec @ARGV' xcrun simctl list devices booted 2>/dev/null | grep -E "iPhone|iPad"
 ```
 
 **検証**:
@@ -45,29 +70,58 @@ xcrun simctl list devices booted 2>/dev/null | grep -E "iPhone|iPad"
   - **`CALLED_FROM_DEBUG_RUN` が設定されている場合**: 親スキルで起動確認済みのため、エラーとして報告して終了
   - **単体実行の場合**: 利用可能なシミュレーター一覧を取得:
     ```bash
-    xcrun simctl list devices available | grep -E "iPhone|iPad"
+    perl -e 'alarm 30; exec @ARGV' xcrun simctl list devices available | grep -E "iPhone|iPad"
     ```
     - 利用可能なシミュレーターが0件の場合は終了
     - ある場合は `AskUserQuestion` でユーザーに選択させ、起動:
       ```bash
-      xcrun simctl boot <simulator-uuid> && open -a Simulator
+      perl -e 'alarm 90; exec @ARGV' xcrun simctl boot <simulator-uuid> && open -a Simulator
+      ```
+      起動完了は待ちコマンドで確認する:
+      ```bash
+      perl -e 'alarm 120; exec @ARGV' xcrun simctl bootstatus <simulator-uuid> -b
       ```
 
-### 2. シミュレーターUUIDを取得
+### 2. SDKとシミュレーターランタイムの整合性を確認
+
+ビルド前に、Xcodeが要求するSDKビルド番号と、インストール済みシミュレーターランタイムのビルド番号を突き合わせる:
 
 ```bash
-xcrun simctl list devices booted | grep -E "iPhone|iPad" | grep -oE '\([A-F0-9-]+\)' | tr -d '()' | head -1
+xcrun --sdk iphonesimulator --show-sdk-build-version
+```
+（例: `23E252`）
+
+```bash
+xcrun simctl runtime list
 ```
 
-### 3. ビルド
+**検証**:
+- SDKビルド番号以上のビルド番号を持つランタイムが存在しない場合、ビルドは `CompileAssetCatalogVariant` ステップで
+  `No simulator runtime version ... available to use with iphonesimulator SDK version ...` エラーにより失敗する。
+- この場合、`xcodebuild -downloadPlatform iOS` の実行可否をユーザーに確認する。**このコマンドは数GBの外部通信を伴い、10分以上かかる**。ユーザーの明示的な許可なしに実行しない。
+- 同一識別子のランタイムが2つ以上並んでいる場合、`simctl install`/`simctl launch` がハングする原因になり得る。古い方のランタイムの削除を検討するようユーザーに注意喚起する。
+
+### 3. シミュレーターUUIDを取得
+
+```bash
+perl -e 'alarm 30; exec @ARGV' xcrun simctl list devices booted | grep -E "iPhone|iPad" | grep -oE '\([A-F0-9-]+\)' | tr -d '()' | head -1
+```
+
+### 4. ビルド
+
+xcodebuildの呼び出しは次の形式に固定する。**generic destination（`generic/platform=iOS Simulator`）は使わない**（Compose Multiplatform 1.11以降、iOSシミュレーター向けターゲットにx86_64が含まれないため、genericでは解決に失敗し得る）。
 
 ```bash
 start_time=$(date +%s)
 
 xcodebuild -project iosApp/iosApp.xcodeproj \
   -scheme iosApp \
+  -configuration Debug \
   -sdk iphonesimulator \
-  -destination 'id=<simulator-uuid>' \
+  -destination 'id=<起動中のsimulator-uuid>' \
+  -derivedDataPath <スクラッチパッド>/DerivedData \
+  CODE_SIGNING_ALLOWED=NO \
+  CODE_SIGNING_REQUIRED=NO \
   build 2>&1
 
 exit_code=$?
@@ -75,28 +129,59 @@ end_time=$(date +%s)
 build_time=$((end_time - start_time))
 ```
 
+このビルドはRun Script経由で `./gradlew :composeApp:app:embedAndSignAppleFrameworkForXcode` を呼び出す（Gradleは直列で1つだけ実行すること）。フレームワーク単体の確認が必要な場合は `./gradlew :composeApp:app:linkDebugFrameworkIosSimulatorArm64` を使う。
+
+**ビルドは10分以上かかることがあるため、バックグラウンド実行で待機し、完了してから後続処理に進む**（Claude CodeのBashツールの `run_in_background` を使う）。
+
 **ビルド失敗時**: エラーハンドリングセクションに従ってエラーを解析
 
-### 4. アプリインストール・起動とランタイムエラー監視
+### 5. 署名とインストール
 
-**ビルド成果物をインストール**:
+`CODE_SIGNING_ALLOWED=NO` でビルドした `.app` は未署名のため、そのまま `simctl install` するとインストールがハングすることがある。**インストール前に必ずad-hoc署名を行う**:
 
-DerivedDataからビルド成果物のパスを特定してインストール:
 ```bash
-app_path=$(find ~/Library/Developer/Xcode/DerivedData -path "*/Debug-iphonesimulator/StarterProject.app" -maxdepth 5 2>/dev/null | head -1)
-xcrun simctl install <simulator-uuid> "$app_path"
+app_path=$(find <スクラッチパッド>/DerivedData -path "*/Debug-iphonesimulator/StarterProject.app" -maxdepth 5 2>/dev/null | head -1)
+codesign --force --deep --sign - "$app_path"
 ```
 
-**アプリを起動**:
+署名後、タイムアウト付きでインストールする:
+
 ```bash
-xcrun simctl launch <simulator-uuid> org.starter.project.StarterProject
+perl -e 'alarm 180; exec @ARGV' xcrun simctl install <simulator-uuid> "$app_path"
+install_exit=$?
+```
+
+`install_exit` が `142` の場合はタイムアウト。トラブルシューティングセクションの復旧手順に従う。
+
+### 6. アプリ起動とランタイムエラー監視
+
+**アプリを起動**（`simctl launch` はハングし得るためタイムアウトを付ける）:
+```bash
+perl -e 'alarm 45; exec @ARGV' xcrun simctl launch <simulator-uuid> org.starter.project.StarterProject
 launch_exit=$?
 ```
+`launch_exit` が `142` の場合はタイムアウト。トラブルシューティングセクションの復旧手順に従う。
 
-**ランタイムエラー監視** (3秒待機):
+**起動確認（ホスト側プロセス生存確認）**:
+シミュレーター上のアプリはホストのプロセスとして観測できるため、`simctl launch` が正常終了してもホスト側で生存確認する:
 ```bash
-sleep 3
-xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath contains "StarterProject"' --last 5s --style compact 2>&1 | grep -i "error\|crash\|exception" | head -20
+ps -eo pid,etime,command | grep "[S]tarterProject.app/StarterProject"
+```
+
+**ログ確認**:
+```bash
+perl -e 'alarm 60; exec @ARGV' xcrun simctl spawn <simulator-uuid> log show --last 2m --style compact --predicate 'process == "StarterProject"'
+```
+出力から `Exception`、`Uncaught Kotlin exception`、`JsonConvertException` をgrepし、ランタイムエラーの有無を判定する。
+
+**スクリーンショット確認**:
+```bash
+perl -e 'alarm 30; exec @ARGV' xcrun simctl io <simulator-uuid> screenshot <path>
+```
+撮影した画像は `Read` ツールで目視確認し、正常な画面かエラー画面かを判定する（結果テーブルの `Loading` 列に使用）。
+**真っ黒な画面の場合**は起動処理がフリーズしている可能性があるため、メインスレッドの状態を採取する:
+```bash
+sample <pid> 3
 ```
 
 ## 出力フォーマット
@@ -112,9 +197,9 @@ xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath conta
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| iOS      | <simulator-name> | Success | Success | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| iOS      | <simulator-name> | Success | Success | OK | <XX>s |
 ```
 
 **ビルド失敗時**:
@@ -122,9 +207,9 @@ xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath conta
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| iOS      | <simulator-name> | Failed | N/A | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| iOS      | <simulator-name> | Failed | N/A | N/A | <XX>s |
 
 ### iOS Build Error
 
@@ -147,9 +232,9 @@ xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath conta
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| iOS      | <simulator-name> | Success | Failed | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| iOS      | <simulator-name> | Success | Failed | Error | <XX>s |
 
 ### iOS Launch Failed: Runtime Error
 
@@ -185,6 +270,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
   "device": "<simulator-name>",
   "build_status": "Success",
   "launch_status": "Success",
+  "loading": "OK",
   "build_time": "<XX>s"
 }
 ```
@@ -196,6 +282,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
   "device": "<simulator-name>",
   "build_status": "Failed",
   "launch_status": "N/A",
+  "loading": "N/A",
   "build_time": "<XX>s",
   "error": {
     "type": "Build Error",
@@ -215,6 +302,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
   "device": "<simulator-name>",
   "build_status": "Success",
   "launch_status": "Failed",
+  "loading": "Error",
   "build_time": "<XX>s",
   "error": {
     "type": "Runtime Error",
@@ -242,7 +330,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
 ### ランタイムエラー解析
 
 ```bash
-xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath contains "StarterProject"' --last 10s --style compact
+perl -e 'alarm 60; exec @ARGV' xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath contains "StarterProject"' --last 10s --style compact
 ```
 
 **抽出する情報**:
@@ -255,3 +343,14 @@ xcrun simctl spawn <simulator-uuid> log show --predicate 'processImagePath conta
 1. `EXC_BAD_ACCESS` → メモリアクセス違反
 2. `precondition failure` → アサーション失敗
 3. `fatalError` → 致命的エラー
+
+## トラブルシューティング
+
+`simctl launch` / `simctl install` がタイムアウト（exit code 142）した場合、以下の順で復旧する:
+
+1. `pkill -f "simctl (install|launch|spawn)"` — ハングしているsimctlプロセスを終了
+2. `xcrun simctl shutdown <simulator-uuid>` — シミュレーターをシャットダウン
+3. `killall -9 com.apple.CoreSimulator.CoreSimulatorService` — CoreSimulatorサービスを再起動
+4. シミュレーターを再度boot
+
+それでも改善しない場合は、ランタイムの重複（同一識別子のランタイムが2つ以上インストールされている状態）を疑い、別のランタイムに紐づくデバイスで試す。

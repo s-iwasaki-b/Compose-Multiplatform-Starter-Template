@@ -16,7 +16,9 @@ allowed-tools:
 - **パッケージ名**: `org.starter.project`
 - **アプリモジュール**: `androidApp`
 - **Gradleタスク**: `:androidApp:installDebug`
-- **Activity**: `org.starter.project/.app.MainActivity`
+- **Activity**: `org.starter.project/.android.MainActivity`
+- **単体テスト**: `./gradlew testAndroidHostTest`
+- **Gradleは直列で1つだけ実行する**（debug-runスキルからAndroid → iOSの順で呼ばれる場合を含む）
 
 ## 前提条件
 
@@ -47,12 +49,15 @@ adb devices 2>/dev/null | grep -E "device$|emulator"
     ```bash
     emulator -list-avds 2>/dev/null
     ```
+    （`emulator` がPATHに無い場合は `$ANDROID_HOME/emulator/emulator -list-avds` → `~/Library/Android/sdk/emulator/emulator -list-avds` の順にフォールバックする）
     - 利用可能なエミュレーターが0件の場合は終了
     - ある場合は `AskUserQuestion` でユーザーに選択させ、起動:
       ```bash
-      emulator -avd <avd-name> -no-snapshot-load &
-      adb wait-for-device shell getprop sys.boot_completed | grep -m 1 '1'
+      emulator -avd <avd-name> &
+      adb wait-for-device shell 'while [ "$(getprop sys.boot_completed)" != "1" ]; do sleep 2; done'
       ```
+      `-no-snapshot-load` は既定で付けない（スナップショットからの起動の方が速いため）。
+      `emulator` コマンドがPATHに無い環境があるため、見つからない場合は `$ANDROID_HOME/emulator/emulator` → `~/Library/Android/sdk/emulator/emulator` の順にフォールバックする。
 
 ### 2. ビルド・インストール
 
@@ -77,15 +82,23 @@ logcat_pid=$!
 
 **アプリを起動**:
 ```bash
-adb shell am start -n org.starter.project/.app.MainActivity
+adb shell am start -n org.starter.project/.android.MainActivity
 ```
 
-**ランタイムエラー監視** (3秒待機):
+**ランタイムエラー監視** (3秒待機。対象プロセスのPIDに絞って確認する):
 ```bash
 sleep 3
 kill $logcat_pid 2>/dev/null
-runtime_error=$(grep -A 20 "FATAL EXCEPTION\|AndroidRuntime" /tmp/android_runtime.log)
+app_pid=$(adb shell pidof org.starter.project)
+runtime_error=$(grep -A 20 -E "FATAL EXCEPTION|JsonConvertException|MissingField|is required|Unresolved" /tmp/android_runtime.log)
 ```
+`FATAL EXCEPTION` だけでなく、`JsonConvertException|MissingField|is required|Unresolved` などデータ読み込み系の例外もgrep対象に含める。可能であれば `--pid="$app_pid"` を付けて対象プロセスのログに絞り込む。RESPONSEのHTTPステータス行（`<-- [0-9]{3}` など）も併せて抽出する。
+
+**スクリーンショット確認**:
+```bash
+adb exec-out screencap -p > <path>
+```
+撮影した画像は `Read` ツールで目視確認し、正常な画面かエラー画面かを判定する（結果テーブルの `Loading` 列 / JSON出力の `loading` フィールドに使用）。
 
 ## 出力フォーマット
 
@@ -100,9 +113,9 @@ runtime_error=$(grep -A 20 "FATAL EXCEPTION\|AndroidRuntime" /tmp/android_runtim
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | <device-name> | Success | Success | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | <device-name> | Success | Success | OK | <XX>s |
 ```
 
 **ビルド失敗時**:
@@ -110,9 +123,9 @@ runtime_error=$(grep -A 20 "FATAL EXCEPTION\|AndroidRuntime" /tmp/android_runtim
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | <device-name> | Failed | N/A | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | <device-name> | Failed | N/A | N/A | <XX>s |
 
 ### Android Build Error
 
@@ -135,9 +148,9 @@ runtime_error=$(grep -A 20 "FATAL EXCEPTION\|AndroidRuntime" /tmp/android_runtim
 ```markdown
 ## Build & Install Results
 
-| Platform | Device | Build | Launch | Build Time |
-|----------|--------|-------|--------|------------|
-| Android  | <device-name> | Success | Failed | <XX>s |
+| Platform | Device | Build | Launch | Loading | Build Time |
+|----------|--------|-------|--------|---------|------------|
+| Android  | <device-name> | Success | Failed | Error | <XX>s |
 
 ### Android Launch Failed: Runtime Error
 
@@ -173,6 +186,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
   "device": "<device-name>",
   "build_status": "Success",
   "launch_status": "Success",
+  "loading": "OK",
   "build_time": "<XX>s"
 }
 ```
@@ -184,6 +198,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
   "device": "<device-name>",
   "build_status": "Failed",
   "launch_status": "N/A",
+  "loading": "N/A",
   "build_time": "<XX>s",
   "error": {
     "type": "Build Error",
@@ -203,6 +218,7 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
   "device": "<device-name>",
   "build_status": "Success",
   "launch_status": "Failed",
+  "loading": "Error",
   "build_time": "<XX>s",
   "error": {
     "type": "Runtime Error",
@@ -230,8 +246,10 @@ debug-runスキルから呼び出された場合、**JSON形式のみ**で出力
 ### ランタイムエラー解析
 
 ```bash
-adb logcat -d -v time 'AndroidRuntime:E' '*:S' | grep -A 30 "FATAL EXCEPTION"
+adb logcat -d --pid=$(adb shell pidof org.starter.project) -v time | grep -A 30 -E "FATAL EXCEPTION|JsonConvertException|MissingField|is required|Unresolved"
 ```
+
+`FATAL EXCEPTION` に加えて `JsonConvertException|MissingField|is required|Unresolved` などのデータ読み込み系例外もgrep対象に含める。RESPONSEのHTTPステータス行（`<-- [0-9]{3}` など）も併せて抽出する。
 
 **抽出する情報**:
 - 例外クラス名

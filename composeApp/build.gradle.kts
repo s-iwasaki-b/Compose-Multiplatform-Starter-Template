@@ -12,18 +12,6 @@ fun allSubProjects(action: (String) -> Unit) {
 }
 
 kotlin {
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            allSubProjects { export(project(":$it")) }
-
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-
     sourceSets {
         commonMain.dependencies {
             allSubProjects { api(project(":$it")) }

@@ -48,17 +48,12 @@ Finally run gradle sync and restart Android Studio before building.
 
 
 # Documentation
-This repository includes a full set of design and coding guides under [`docs/`](docs/README.md), written in Japanese so that both AI coding agents and human developers can reproduce the same design decisions even after the sample code below is removed.
+This repository is documented for AI coding agents in three layers, written in Japanese so agents and human developers reproduce the same design decisions even after the sample code below is removed.
 
-Entry points:
-- [`docs/README.md`](docs/README.md) — index of every guide, task-based reading list, and known deviations in the sample code
-- [`AGENTS.md`](AGENTS.md) — entry point for AI coding agents (10 non-negotiable rules); [`CLAUDE.md`](CLAUDE.md) just imports it for Claude Code
-
-Representative pages:
-- [`docs/architecture/overview.md`](docs/architecture/overview.md) — layer structure and module dependency rules
-- [`docs/guides/`](docs/guides/) — per-layer coding conventions (data, domain, UI, testing, style, git)
-- [`docs/playbooks/add-feature-screen.md`](docs/playbooks/add-feature-screen.md), [`docs/playbooks/remove-sample-code.md`](docs/playbooks/remove-sample-code.md) — step-by-step guides for adding a screen or removing the sample
-- [`docs/decisions/`](docs/decisions/README.md) — Architecture Decision Records behind each convention
+- [`AGENTS.md`](AGENTS.md) — repository entry point: 10 non-negotiable rules, the orchestrator/implementer workflow, a module map, and a task-based reading list. [`CLAUDE.md`](CLAUDE.md) just imports it for Claude Code.
+- [`docs/design-guide.md`](docs/design-guide.md), [`docs/coding-guide.md`](docs/coding-guide.md), [`docs/decisions.md`](docs/decisions.md) — the three reference docs: architecture/layering, per-layer implementation conventions, and the decision log behind each convention.
+- `composeApp/<layer>/<name>/AGENTS.md` — a per-module implementation guide (responsibilities, dependencies, code patterns, tests) for each of the 10 modules; an implementation agent reads its module's file first.
+- [`.claude/skills/`](.claude/skills/) — step-by-step procedures (e.g. `add-feature-screen`, `add-data-source`, `remove-sample-code`) for the orchestrator to follow and delegate from.
 
 
 # iOS Integration

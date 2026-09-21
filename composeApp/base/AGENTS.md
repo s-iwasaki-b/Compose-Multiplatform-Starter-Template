@@ -20,9 +20,8 @@
 
 ```
 composeApp/base/src/commonMain/kotlin/org/starter/project/base/
-  data/model/zenn/
-    Articles.kt              # Articles, Article（ネスト User を含む）
-    User.kt                  # User domain モデル
+  data/model/<feature>/
+    Xxx.kt                    # Xxx domain モデル
   error/
     ApiError.kt              # ApiError sealed class、ApiErrorResponse（@Serializable）
     ConversionError.kt       # ConversionError sealed class
@@ -31,7 +30,7 @@ composeApp/base/src/commonMain/kotlin/org/starter/project/base/
     ResultExtension.kt           # Result<Success>.handle
 ```
 
-`data/model/zenn/` はサンプル実装（Zenn ビューワー）。新しい機能ドメインを追加する場合は `data/model/<feature>/` を新設する。
+具体名は本モジュールのディレクトリを見る。新しい機能ドメインを追加する場合は `data/model/<feature>/` を新設する。
 
 ## 実装パターン
 

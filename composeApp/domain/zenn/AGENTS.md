@@ -1,6 +1,6 @@
 # composeApp/domain/zenn
 
-`domain/<name>` は Service 実装（`XxxServiceImpl`）を持つモジュールです（本書は `domain/zenn` を具体例として一般化しています）。本ファイルはこのモジュールで作業する実装エージェントの入口である。ルートの [AGENTS.md](../../../AGENTS.md)（絶対ルール・実行体制）を前提とし、ツールが自動で読み込まない場合は先に読む。実装エージェントは本モジュール外のファイルを編集せず、必要な他モジュールの変更は「他モジュールとの接点」に沿ってオーケストレーターへ報告する。読み順は本ファイル → 「参照」節の docs。
+`domain/<name>` は Service 実装（`XxxServiceImpl`）を持つモジュール一般の書き方を示す。具体名は本モジュールのディレクトリと `build.gradle.kts` を見る。本ファイルはこのモジュールで作業する実装エージェントの入口である。ルートの [AGENTS.md](../../../AGENTS.md)（絶対ルール・実行体制）を前提とし、ツールが自動で読み込まない場合は先に読む。実装エージェントは本モジュール外のファイルを編集せず、必要な他モジュールの変更は「他モジュールとの接点」に沿ってオーケストレーターへ報告する。読み順は本ファイル → 「参照」節の docs。
 
 ## 責務
 
@@ -24,10 +24,10 @@ plugins: `kmp-library` + `mokkery`。依存してよいのは `base`（`api`）�
 ## 構成
 
 ```text
-src/commonMain/kotlin/org/starter/project/domain/zenn/
-  ZennServiceImpl.kt
-src/commonTest/kotlin/org/starter/project/domain/zenn/
-  ZennServiceTest.kt
+src/commonMain/kotlin/org/starter/project/domain/<name>/
+  XxxServiceImpl.kt
+src/commonTest/kotlin/org/starter/project/domain/<name>/
+  XxxServiceTest.kt
 ```
 新規 `domain/<name>` モジュールもこれと同じ2ディレクトリ構成にする。
 
@@ -44,7 +44,7 @@ class XxxServiceImpl(
     }
 }
 ```
-複数 Repository の合成（コンストラクタ注入で束ねる。`ZennServiceImpl.fetchArticles` は publication 検索が空なら user 検索にフォールバックする）:
+複数 Repository の合成（コンストラクタ注入で束ねる。主系の検索結果が空なら副系の検索にフォールバックする例）:
 ```kotlin
 class XxxServiceImpl(
     private val resultHandler: ResultHandler,
@@ -75,7 +75,7 @@ class AppSettingsServiceImpl(
 ## テスト
 
 Service 実装（`XxxServiceImpl`）は必須テスト対象。依存する Repository interface を Mokkery でモックする（`mock<XxxRepository>(MockMode.autofill)`）。配置は `src/commonTest/kotlin/org/starter/project/domain/<name>/XxxServiceTest.kt`。`ResultHandler(testDispatcher)` に `StandardTestDispatcher()` を注入し `runTest(testDispatcher)` を使う。`everySuspend {} returns/throws`、`verifySuspend {}` で検証する。
-実行コマンド: `./gradlew :composeApp:domain:zenn:testAndroidHostTest`（新規モジュールは `:composeApp:domain:<name>:testAndroidHostTest`）
+実行コマンド: `./gradlew :composeApp:domain:<name>:testAndroidHostTest`
 
 ## 他モジュールとの接点
 
@@ -86,7 +86,7 @@ Service 実装（`XxxServiceImpl`）は必須テスト対象。依存する Repo
 
 ## 完了条件
 
-- `./gradlew :composeApp:domain:zenn:testAndroidHostTest` が通ること
+- `./gradlew :composeApp:domain:<name>:testAndroidHostTest` が通ること
 - Service 実装の全メソッドが `resultHandler.async`/`immediate`（`Unit` は `asyncUnit`/`immediateUnit`）で包まれているか
 - `data:repository` の interface にのみ依存し、`data:<source>` に依存していないか
 - 複数 Repository を扱う場合、コンストラクタ注入で束ねているか

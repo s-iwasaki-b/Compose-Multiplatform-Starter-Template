@@ -31,7 +31,7 @@ kotlin {
 ```
 src/commonMain/kotlin/org/starter/project/data/repository/
   Repository.kt         # マーカー interface（空、3行）
-  ZennRepository.kt      # Repository interface の実例
+  XxxRepository.kt       # Repository interface の実例
 ```
 
 新しい外部リソースの追加時はこのディレクトリに `XxxRepository.kt` を追記する。モジュール自体は分割しない。

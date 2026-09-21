@@ -13,7 +13,7 @@
 
 `build.gradle.kts` と一致（`kmp-compose-library` + `kotlin.serialization`。iOS フレームワーク `ComposeApp` を静的リンクで生成）:
 
-- `commonMain`: `core`、`data.repository`、`domain.service`、`ui`（常設）に加え、現状は `data.zenn`/`domain.zenn`/`feature.home`/`feature.user`（Zenn サンプル。削除後は自プロジェクトの `data:<source>`/`domain:<name>`/`feature:<name>` に置き換わる）を `implementation` する
+- `commonMain`: `core`、`data.repository`、`domain.service`、`ui`（常設）に加え、存在する `data:<source>` / `domain:<name>` / `feature:<name>` をすべて `implementation` で列挙する。現状の一覧は `build.gradle.kts` を見る
 - `androidMain`: `implementation(libs.koin.android)`
 
 `composeApp` 配下で唯一 `expect`/`actual`（`platformModule`）を持てるモジュール。namespace と異なる関心事別パッケージ分割（`app`/`navigation`/`di`/`log`）が許される唯一の例外。

@@ -24,7 +24,7 @@ plugins: `kmp-library` + `mokkery`
 src/commonMain/kotlin/org/starter/project/domain/service/
   Service.kt        # マーカー interface
   ResultHandler.kt   # Result 化ユーティリティ
-  ZennService.kt      # Service interface（サンプル。削除後は存在しない）
+  XxxService.kt       # Service interface（サンプル。削除後は存在しない）
 ```
 
 ## 実装パターン

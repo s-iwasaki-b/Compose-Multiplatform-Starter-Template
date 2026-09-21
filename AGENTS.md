@@ -41,20 +41,21 @@ composeApp/
   core/              Ktor ApiClient・Preferences 等のインフラ基盤（AGENTS.md あり）
   data/
     repository/      Repository interface の契約モジュール（AGENTS.md あり）
-    zenn/            Zenn API のデータソース実装。data/<name> 系の雛形（サンプル。AGENTS.md あり）
+    <source>/        外部 API 等のデータソース実装（AGENTS.md あり）
   domain/
     service/         Service interface の契約モジュール（AGENTS.md あり）
-    zenn/            Zenn 向け Service 実装。domain/<name> 系の雛形（サンプル。AGENTS.md あり）
+    <name>/          Service 実装（AGENTS.md あり）
   ui/                画面間で共有する UI コンポーネント・Route 型（AGENTS.md あり）
   feature/
-    home/            ホーム画面（サンプル。プレースホルダ化対象。AGENTS.md あり）
-    user/            ユーザー画面（サンプル。削除対象。AGENTS.md あり）
+    <name>/          1 機能の画面一式（AGENTS.md あり）
   app/               Koin 登録・NavHost・エントリポイント統合（AGENTS.md あり）
 androidApp/          Android エントリポイント
 iosApp/              iOS エントリポイント（Xcode プロジェクト）
 docs/                design-guide / coding-guide / decisions（読み物）
 .claude/skills/      手順（skills）
 ```
+
+現状は Zenn 記事ビューワーのサンプル実装が入っている。`remove-sample-code` で削除する。
 
 ## タスク別の読み順
 
@@ -81,5 +82,6 @@ docs/                design-guide / coding-guide / decisions（読み物）
 - UI を変更した PR は、修正箇所ごとに before / after のスクリーンショットを表形式（修正箇所 | Before | After）で `## Verification` に添付する。取得と添付の手順は [capture-screenshots](.claude/skills/capture-screenshots/SKILL.md)。
 - 削除は `git rm`/`rm` の前に対象一覧を提示し、明示的な確認を得てから実行する。
 - 規約を変更する場合は、同じ PR で該当する docs（[docs/design-guide.md](docs/design-guide.md)、[docs/coding-guide.md](docs/coding-guide.md)、[docs/decisions.md](docs/decisions.md)）とモジュール `AGENTS.md` を更新する。
+- ルートおよびモジュールの `AGENTS.md` にはサンプル固有のリソース名（画面名・API 名・クラス名）を書かず、`data/<source>` / `feature/<name>` / `Xxx…` のプレースホルダで書く。具体名はディレクトリと `build.gradle.kts` を見る。
 - 新規コードに [docs/coding-guide.md](docs/coding-guide.md) §8 の既知の逸脱を複製しない（PR 前チェックで確認）。
 - 詳細は [docs/coding-guide.md](docs/coding-guide.md) §6 を参照。

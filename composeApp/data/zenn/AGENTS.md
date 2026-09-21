@@ -1,6 +1,6 @@
 # composeApp/data/zenn
 
-`data:zenn` は Zenn API 1本分のデータソース実装モジュールであり、`data/<name>` 系モジュール一般の書き方の具体例である。本ファイルはこのモジュールで作業する実装エージェントの入口である。ルートの [AGENTS.md](../../../AGENTS.md)（絶対ルール・実行体制）を前提とし、ツールが自動で読み込まない場合は先に読む。実装エージェントは本モジュール外のファイルを編集せず、必要な他モジュールの変更は「他モジュールとの接点」に沿ってオーケストレーターへ報告する。読み順は本ファイル → 「参照」節の docs。
+`data/<source>` 系モジュール一般の書き方を示す。具体名は本モジュールのディレクトリと `build.gradle.kts` を見る。本ファイルはこのモジュールで作業する実装エージェントの入口である。ルートの [AGENTS.md](../../../AGENTS.md)（絶対ルール・実行体制）を前提とし、ツールが自動で読み込まない場合は先に読む。実装エージェントは本モジュール外のファイルを編集せず、必要な他モジュールの変更は「他モジュールとの接点」に沿ってオーケストレーターへ報告する。読み順は本ファイル → 「参照」節の docs。
 
 ## 責務
 
@@ -40,20 +40,20 @@ kotlin {
 ## 構成
 
 ```
-src/commonMain/kotlin/org/starter/project/data/zenn/
-  datasource/api/ZennApi.kt                    # Ktorfit interface（実装は書かない）
-  datasource/api/response/ArticlesResponse.kt  # 一覧 DTO（ラッパー + 要素 + ネスト）
-  datasource/api/response/UserResponse.kt      # 単体 DTO
-  datasource/preferences/ZennPreferences.kt    # interface + Impl
-  converter/ArticlesConverter.kt               # 一覧変換（mapNotNull）
-  converter/UserConverter.kt                   # 単体変換
-  repository/ZennRepositoryImpl.kt             # ZennRepository の実装
-src/commonTest/kotlin/org/starter/project/data/zenn/  # 上記とミラーのパッケージ
+src/commonMain/kotlin/org/starter/project/data/<source>/
+  datasource/api/XxxApi.kt                     # Ktorfit interface（実装は書かない）
+  datasource/api/response/XxxListResponse.kt   # 一覧 DTO（ラッパー + 要素 + ネスト）
+  datasource/api/response/XxxResponse.kt       # 単体 DTO
+  datasource/preferences/XxxPreferences.kt     # interface + Impl
+  converter/XxxListConverter.kt                # 一覧変換（mapNotNull）
+  converter/XxxConverter.kt                    # 単体変換
+  repository/XxxRepositoryImpl.kt              # XxxRepository の実装
+src/commonTest/kotlin/org/starter/project/data/<source>/  # 上記とミラーのパッケージ
 ```
 
 ## 実装パターン
 
-Ktorfit API/DTO/Converter/Repository の一般的な型テンプレは重複させず [coding-guide.md](../../../docs/coding-guide.md) §2 を参照。本節はこのモジュール固有の一覧 API パターンのみ示す: レスポンスをラッパー型にし、要素は `mapNotNull` + `ConversionError` 捕捉で1件ずつ変換失敗を許容する（`ArticlesResponse`/`ArticlesConverter` が実例）。単体 API は `validateNotNull` の例外をそのまま伝播させる（`UserResponse`/`UserConverter` が実例）。
+Ktorfit API/DTO/Converter/Repository の一般的な型テンプレは重複させず [coding-guide.md](../../../docs/coding-guide.md) §2 を参照。本節はこのモジュール固有の一覧 API パターンのみ示す: レスポンスをラッパー型にし、要素は `mapNotNull` + `ConversionError` 捕捉で1件ずつ変換失敗を許容する。単体 API は `validateNotNull` の例外をそのまま伝播させる。具体名は本モジュールのディレクトリと `build.gradle.kts` を見る。
 
 ```kotlin
 object XxxListConverter {
@@ -68,13 +68,13 @@ object XxxListConverter {
 }
 ```
 
-**PagingSource の置き場所**: 本モジュールは単発取得＋カーソルのみ提供する。`Pager`/`PagingSource` の組み立ては行わず `ui` に置く（→ decisions.md D-05。`ArticlesPagingSource` が実例）。
+**PagingSource の置き場所**: 本モジュールは単発取得＋カーソルのみ提供する。`Pager`/`PagingSource` の組み立ては行わず `ui` に置く（→ decisions.md D-05）。
 
 ## テスト
 
 - 対象: Converter（一覧変換の1件失敗許容、単体変換の例外伝播）と Repository 実装（API/Preferences をモック）。`src/commonTest` にソースとミラーのパッケージ構成で置く。
 - Mokkery: モック対象は interface（`mock<XxxApi>()`）。「呼ばれたこと」だけ検証するメソッドがあれば `mock<XxxPreferences>(MockMode.autofill)` にする。スタブは `every`/`everySuspend { } returns/throws`、副作用の検証は `verify(VerifyMode.exactly(n)) { }`。
-- 実行コマンド: モジュール単位 `./gradlew :composeApp:data:zenn:testAndroidHostTest`、全体 `./gradlew testAndroidHostTest`（Gradle 自体はここでは実行しない）。
+- 実行コマンド: モジュール単位 `./gradlew :composeApp:data:<source>:testAndroidHostTest`、全体 `./gradlew testAndroidHostTest`（Gradle 自体はここでは実行しない）。
 
 ## 他モジュールとの接点
 
@@ -87,7 +87,7 @@ object XxxListConverter {
 
 ## 完了条件
 
-- `./gradlew :composeApp:data:zenn:testAndroidHostTest` 相当のテストコマンドで検証済み。
+- `./gradlew :composeApp:data:<source>:testAndroidHostTest` 相当のテストコマンドで検証済み。
 - DTO が全フィールド `Xxx? = null` になっている。
 - Repository/Converter（一覧変換以外）が例外を透過し、`PagingSource` を本モジュールに追加していない。
 - 「他モジュールとの接点」の項目をオーケストレーターへの報告に含めた。

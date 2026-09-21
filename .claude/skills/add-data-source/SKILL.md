@@ -17,7 +17,7 @@ description: Add a new external data source (API or local-settings-backed resour
 
 ### 2. 新規モジュールの雛形作成（監督者が直接行う。委譲なし）
 
-新設する場合、`settings.gradle.kts` に `include(":composeApp:data:<source>")`/`include(":composeApp:domain:<name>")` を追記し、両ディレクトリを作成する。同系モジュール `composeApp/data/zenn/` と `composeApp/domain/zenn/` から、それぞれ `AGENTS.md`/`CLAUDE.md` をコピーして調整する。実装エージェントが最初に読むファイルなので、このステップで用意しておく。
+新設する場合、`settings.gradle.kts` に `include(":composeApp:data:<source>")`/`include(":composeApp:domain:<name>")` を追記し、両ディレクトリを作成する。同系の既存モジュール（`composeApp/data/<source>/`、`composeApp/domain/<name>/` 等）から、それぞれ `AGENTS.md`/`CLAUDE.md` をコピーして調整する。無ければ `docs/coding-guide.md` の該当節（§2 / §3）を基に新規作成する。実装エージェントが最初に読むファイルなので、このステップで用意しておく。
 
 ### 3. 契約整備（実装エージェントへ委譲。**直列必須**、実装フェーズ全体の前提）
 

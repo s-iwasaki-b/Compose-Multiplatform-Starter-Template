@@ -15,7 +15,7 @@ description: Add a new screen to the app as a feature module or a sub-package of
 
 ### 2. モジュール方針の決定（監督者が直接行う。委譲なし）
 
-新しい `feature` モジュールを新設するか、既存モジュールに `<screen>/` サブパッケージを追加するかを判断する（→ docs/decisions.md D-09）。新設する場合は `settings.gradle.kts` に `include(":composeApp:feature:<feature>")` を追記し、`composeApp/feature/<feature>/` を作成した上で、同系モジュール `composeApp/feature/home/` から `AGENTS.md` と `CLAUDE.md` をコピーして調整する。実装エージェントが最初に読むファイルなので、このステップで用意しておく。
+新しい `feature` モジュールを新設するか、既存モジュールに `<screen>/` サブパッケージを追加するかを判断する（→ docs/decisions.md D-09）。新設する場合は `settings.gradle.kts` に `include(":composeApp:feature:<feature>")` を追記し、`composeApp/feature/<feature>/` を作成した上で、同系の既存モジュール（`composeApp/feature/<name>/` 等）から `AGENTS.md` と `CLAUDE.md` をコピーして調整する。無ければ `docs/coding-guide.md` の該当節（§4）を基に新規作成する。実装エージェントが最初に読むファイルなので、このステップで用意しておく。
 
 ### 3. 契約整備: `ui` への Route 追加（実装エージェントへ委譲。**直列必須**、後続すべての前提）
 

@@ -30,10 +30,10 @@ src/commonMain/kotlin/org/starter/project/ui/
     theme/SystemTheme.kt
   route/AppRoute.kt
   shared/
-    component/article/        # Zenn サンプル。削除後は各ドメインの component/ に置き換わる
-      ArticleList.kt
-      ArticleListItem.kt
-      ArticlesPagingSource.kt
+    component/<domain>/       # ドメイン依存の共通コンポーネント（2 箇所以上で再利用するもの）
+      XxxList.kt
+      XxxListItem.kt
+      XxxPagingSource.kt
     event/ScreenEvent.kt
     handler/{ErrorScreenThrowableHandler,SnackBarThrowableHandler,IgnoreThrowableHandler}.kt
     state/ScreenState.kt

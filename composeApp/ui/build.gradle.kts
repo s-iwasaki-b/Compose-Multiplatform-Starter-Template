@@ -12,17 +12,6 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(libs.compose.runtime)
-            api(libs.compose.foundation)
-            api(libs.compose.material)
-            api(libs.compose.material.icons.extended)
-            api(libs.compose.ui)
-            api(libs.compose.components.resources)
-            api(libs.compose.ui.tooling.preview)
-            api(libs.androidx.lifecycle.viewmodel.compose)
-            api(libs.androidx.lifecycle.runtime.compose)
-            api(libs.androidx.navigation.compose)
-
             api(projects.composeApp.base)
             api(libs.bundles.ui)
         }

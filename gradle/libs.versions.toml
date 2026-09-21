@@ -121,6 +121,10 @@ base = [
     "kotlinx-datetime",
     "ktor-serialization-kotlinx-json",
     "napier",
+    "compose-foundation",
+    "compose-ui",
+    "androidx-lifecycle-viewmodel-compose",
+    "androidx-lifecycle-runtime-compose",
 ]
 core = [
     "ktorfit",
@@ -139,6 +143,12 @@ data = [
 domain = [
 ]
 ui = [
+    "compose-runtime",
+    "compose-material",
+    "compose-material-icons-extended",
+    "compose-components-resources",
+    "compose-ui-tooling-preview",
+    "androidx-navigation-compose",
     "androidx-paging-compose",
     "coil",
     "coil-network",

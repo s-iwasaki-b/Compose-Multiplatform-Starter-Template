@@ -47,6 +47,20 @@ Finally run gradle sync and restart Android Studio before building.
 ![Compose Multiplatform Starter Repository Architecture](https://github.com/user-attachments/assets/90445e4b-ceda-47d3-a21b-b2461c7e3eab)
 
 
+# Documentation
+This repository includes a full set of design and coding guides under [`docs/`](docs/README.md), written in Japanese so that both AI coding agents and human developers can reproduce the same design decisions even after the sample code below is removed.
+
+Entry points:
+- [`docs/README.md`](docs/README.md) — index of every guide, task-based reading list, and known deviations in the sample code
+- [`AGENTS.md`](AGENTS.md) — entry point for AI coding agents (10 non-negotiable rules); [`CLAUDE.md`](CLAUDE.md) just imports it for Claude Code
+
+Representative pages:
+- [`docs/architecture/overview.md`](docs/architecture/overview.md) — layer structure and module dependency rules
+- [`docs/guides/`](docs/guides/) — per-layer coding conventions (data, domain, UI, testing, style, git)
+- [`docs/playbooks/add-feature-screen.md`](docs/playbooks/add-feature-screen.md), [`docs/playbooks/remove-sample-code.md`](docs/playbooks/remove-sample-code.md) — step-by-step guides for adding a screen or removing the sample
+- [`docs/decisions/`](docs/decisions/README.md) — Architecture Decision Records behind each convention
+
+
 # iOS Integration
 The iOS app links the static Kotlin/Native framework `ComposeApp.framework` built from the `composeApp:app` module. Xcode builds and embeds it through the Run Script phase `./gradlew :composeApp:app:embedAndSignAppleFrameworkForXcode`, and Framework Search Paths point to `composeApp/app/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`.
 

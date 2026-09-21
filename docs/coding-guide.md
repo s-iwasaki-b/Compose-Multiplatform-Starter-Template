@@ -253,6 +253,8 @@ EOF
 - **必須** 8節の既知の逸脱を新規コードにコピーしていないか確認する。
 - **必須** ガイド・`decisions.md` と矛盾する変更をした場合、同じ PR でドキュメントも更新する。
 - **必須** UI を変更した場合、修正箇所ごとに before / after のスクリーンショットを表形式（修正箇所 | Before | After）で PR 本文の `## Verification` に添付する（手順は `.claude/skills/capture-screenshots`）。
+- **必須** PR 本文の構成・`Stack n/N` 表記・Conventional Commits・UI 変更時の Before/After 表は CI（`.github/workflows/pr-checks.yml`）が検証する（差分 300 行超は警告のみで失敗しない）。PR 本文は `.github/PULL_REQUEST_TEMPLATE.md` の雛形から書く。
+- **必須** UI 変更の判定が誤検知だった場合は本文に `<!-- no-ui-change -->` を追加し、理由を `## Intentionally left as-is` に記す。
 
 ## 7. 手順（skills）
 

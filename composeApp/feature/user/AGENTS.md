@@ -28,10 +28,10 @@
 ```
 composeApp/feature/<name>/src/commonMain/
   kotlin/org/starter/project/feature/<name>/
-    XxxScreen.kt      # XxxScreen（stateful）/ XxxScreenContent（stateless）
-    XxxScreenState.kt # XxxScreenState
-    XxxScreenEvent.kt # XxxScreenEvent / XxxScreenEventHandler
-    XxxViewModel.kt   # XxxViewModel
+    XxxScreen.kt          # XxxScreen（stateful）/ XxxScreenContent（stateless）
+    XxxScreenState.kt     # XxxScreenState
+    XxxScreenEvent.kt     # XxxScreenEvent / XxxScreenEventHandler
+    XxxScreenViewModel.kt # XxxScreenViewModel
     component/
       XxxHeader.kt    # 画面専用コンポーネント（例: プロフィールヘッダ）
   composeResources/values/
@@ -45,7 +45,7 @@ composeApp/feature/<name>/src/commonMain/
 ```kotlin
 // XxxScreen.kt（Route 引数をトリガーに ViewModel を初期化する）
 @Composable
-fun XxxScreen(viewModel: XxxViewModel, appRouter: AppRouter, navArgs: AppRoute.Xxx.NavArgs) {
+fun XxxScreen(viewModel: XxxScreenViewModel, appRouter: AppRouter, navArgs: AppRoute.Xxx.NavArgs) {
     val state by viewModel.state.collectAsState()
     LaunchedEffect(navArgs.id) { viewModel.refresh(navArgs.id) }
     XxxScreenContent(state = state, itemsPagingItems = itemsPagingItems) { event ->
@@ -60,11 +60,11 @@ fun XxxScreen(viewModel: XxxViewModel, appRouter: AppRouter, navArgs: AppRoute.X
 
 ## テスト
 
-- 対象は `XxxViewModel`。Mokkery で `XxxService` を mock し、`Dispatchers.setMain(StandardTestDispatcher())`/`resetMain()` を使う（→ coding-guide.md §5, decisions.md D-06, D-17, D-18）。
+- 対象は `XxxScreenViewModel`。Mokkery で `XxxService` を mock し、`Dispatchers.setMain(StandardTestDispatcher())`/`resetMain()` を使う（→ coding-guide.md §5, decisions.md D-06, D-17, D-18）。
 - `init { fetchDetail() }` が `viewModelScope.launch` を起動するため、`subject` はプロパティ初期化子ではなく `@BeforeTest` 内で `Dispatchers.setMain(...)` の**後**に生成する（`lateinit var` にする）。
 - `fetchDetail`/`updateScreenLoading`/`updateScreenSuccess`/`fetchItems` は `@VisibleForTesting internal` のため直接呼べる。
 - 検証すること: 初期状態、`refresh(id)` 呼び出し後に `xxxService.fetchDetail(id)` が呼ばれ `state` が更新されること、取得失敗時に `screenState.screenLoadingState` が `Failure` になること。
-- 配置: `src/commonTest/kotlin/org/starter/project/feature/<name>/XxxViewModelTest.kt`（本モジュール配下）。
+- 配置: `src/commonTest/kotlin/org/starter/project/feature/<name>/XxxScreenViewModelTest.kt`（本モジュール配下）。
 - 実行: `./gradlew :composeApp:feature:<name>:testAndroidHostTest`（モジュール単位）/ `./gradlew testAndroidHostTest`（全体）。Gradle はこのエージェントからは実行しない。
 
 ## 他モジュールとの接点
@@ -77,7 +77,7 @@ fun XxxScreen(viewModel: XxxViewModel, appRouter: AppRouter, navArgs: AppRoute.X
 
 ## 完了条件
 
-- `XxxViewModel` のコンストラクタ引数が `domain:service` の interface のみであることを確認した。
+- `XxxScreenViewModel` のコンストラクタ引数が `domain:service` の interface のみであることを確認した。
 - 画面遷移（戻る操作を含む）が `XxxScreenEventHandler` からのみ発火し、ViewModel に `AppRouter` を注入していないことを確認した。
 - `component/` に追加したコンポーネントの再利用範囲を確認し、置き場所の判断基準（coding-guide.md §4）に沿っていることを確認した。
 - 変更した ViewModel ロジックに対応するテストがあり、`./gradlew :composeApp:feature:<name>:testAndroidHostTest` がローカルで通ることを確認した（Gradle 実行不可の環境では確認方法を報告に明記する）。

@@ -4,7 +4,7 @@
 
 ## 責務
 
-- **置く**: 1 機能ドメイン（ユーザーフロー）の画面一式。1 画面なら `XxxScreen`/`XxxScreenState`/`XxxScreenEvent`/`XxxViewModel` の 4 点セットをパッケージ直下に置く。
+- **置く**: 1 機能ドメイン（ユーザーフロー）の画面一式。1 画面なら `XxxScreen`/`XxxScreenState`/`XxxScreenEvent`/`XxxScreenViewModel` の 4 点セットをパッケージ直下に置く。
 - **置く**: 画面専用の小コンポーネント。ただし 2 箇所以上で再利用される、または `base` のドメインモデルに依存しない汎用部品になった場合は `ui` へ昇格する（→ coding-guide.md §4 判断基準）。
 - **置かない**: Repository/Service の実装、DTO、`data`/`domain:<name>` の型。
 - **置かない**: 他 feature モジュールへの直接参照。画面間の連携は Route 経由（`AppRouter.navigate`）にする。
@@ -27,10 +27,10 @@
 
 ```
 composeApp/feature/<name>/src/commonMain/kotlin/org/starter/project/feature/<name>/
-  XxxScreen.kt      # XxxScreen（stateful）/ XxxScreenContent（stateless）
-  XxxScreenState.kt # XxxScreenState
-  XxxScreenEvent.kt # XxxScreenEvent / XxxScreenEventHandler
-  XxxViewModel.kt   # XxxViewModel
+  XxxScreen.kt          # XxxScreen（stateful）/ XxxScreenContent（stateless）
+  XxxScreenState.kt     # XxxScreenState
+  XxxScreenEvent.kt     # XxxScreenEvent / XxxScreenEventHandler
+  XxxScreenViewModel.kt # XxxScreenViewModel
 ```
 
 1 画面のみのため `<screen>/` サブパッケージは切らない。画面専用コンポーネントが必要になったら `component/` を追加する（現状は無し）。
@@ -40,7 +40,7 @@ composeApp/feature/<name>/src/commonMain/kotlin/org/starter/project/feature/<nam
 4 点セットの命名・骨格は coding-guide.md §4 の一般形に従う。本モジュール固有の差分は検索キーワードに連動する Paging3 の組み立て:
 
 ```kotlin
-// XxxViewModel.kt（検索キーワード → debounce → Pager 切替）
+// XxxScreenViewModel.kt（検索キーワード → debounce → Pager 切替）
 val itemsPagingFlow = _state
     .map { it.searchKeyword }
     .distinctUntilChanged()
@@ -62,10 +62,10 @@ val itemsPagingFlow = _state
 
 ## テスト
 
-- 対象は `XxxViewModel`。Mokkery で `XxxService` を mock し、`Dispatchers.setMain(StandardTestDispatcher())`/`resetMain()` を使う（→ coding-guide.md §5, decisions.md D-06, D-17, D-18）。
+- 対象は `XxxScreenViewModel`。Mokkery で `XxxService` を mock し、`Dispatchers.setMain(StandardTestDispatcher())`/`resetMain()` を使う（→ coding-guide.md §5, decisions.md D-06, D-17, D-18）。
 - `updateScreenLoading`/`updateScreenSuccess`/`fetchItems`/`initSearchKeyword`/`updateSearchKeyword` は `@VisibleForTesting internal` のため、`Pager`/`PagingSource` を経由せずテストから直接呼べる。
 - 検証すること: 初期状態（`ScreenLoadingState.Initial`）、`updateSearchKeyword` 呼び出し後の `state.searchKeyword`、`isPullToRefreshing` が true の間 `updateScreenLoading` が状態を変えないこと、`fetchItems` が `xxxService.fetchItems(keyword, nextPage)` を呼ぶこと。
-- 配置: `src/commonTest/kotlin/org/starter/project/feature/<name>/XxxViewModelTest.kt`（本モジュール配下）。
+- 配置: `src/commonTest/kotlin/org/starter/project/feature/<name>/XxxScreenViewModelTest.kt`（本モジュール配下）。
 - 実行: `./gradlew :composeApp:feature:<name>:testAndroidHostTest`（モジュール単位）/ `./gradlew testAndroidHostTest`（全体）。Gradle はこのエージェントからは実行しない。
 
 ## 他モジュールとの接点
@@ -77,7 +77,7 @@ val itemsPagingFlow = _state
 
 ## 完了条件
 
-- `XxxViewModel` のコンストラクタ引数が `domain:service` の interface のみであることを確認した。
+- `XxxScreenViewModel` のコンストラクタ引数が `domain:service` の interface のみであることを確認した。
 - 追加・変更した公開状態が `combine(_screenState, _state).stateIn(...)` 経由で公開されている（直接代入していない）ことを確認した。
 - 画面遷移が `XxxScreenEventHandler` からのみ発火し、ViewModel に `AppRouter` を注入していないことを確認した。
 - 変更した ViewModel ロジックに対応するテストがあり、`./gradlew :composeApp:feature:<name>:testAndroidHostTest` がローカルで通ることを確認した（Gradle 実行不可の環境では確認方法を報告に明記する）。

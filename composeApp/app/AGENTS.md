@@ -4,6 +4,8 @@
 
 本ファイルはこのモジュールで作業する実装エージェントの入口である。ルートの [AGENTS.md](../../AGENTS.md)（絶対ルール・実行体制）を前提とし、ツールが自動で読み込まない場合は先に読む。実装エージェントは本モジュール外のファイルを編集せず、必要な他モジュールの変更は「他モジュールとの接点」に沿ってオーケストレーターへ報告する。読み順は本ファイル → 「参照」節の docs。
 
+Koin バインドと `AppNavHost` の Route の登録・削除、`build.gradle.kts` の依存追加・削除は、他モジュールの変更を取り込む統合作業として監督者が直接行う（→ ルート AGENTS.md 実行体制ルール1）。DeepLink 処理・プラットフォーム別バインド・エントリ Composable 等、それ以外の本モジュール内の実装は実装エージェントに委譲する。
+
 ## 責務
 
 - 置く: `startKoin`（層別 `module { }` 全体、`Koin.kt`）、`expect val platformModule` とその `actual`（`Koin.android.kt`/`Koin.ios.kt`）、`Main()`（`MainApp.kt`）、`AppNavHost`/`AppRouterImpl`/`rememberAppRouter`、`DeepLinkConfig`/`DeepLinkHandler`、iOS エントリ `MainViewController`、iOS 用 Napier 初期化プロキシ（`log/NapierProxy.kt`）。

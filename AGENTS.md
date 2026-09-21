@@ -18,12 +18,12 @@
 
 ## 実行体制（オーケストレーション）
 
-1. 監督者（オーケストレーター）は分解・委譲・整合性検証を行い、モジュール内の実装コードを自分で書かない。
+1. 監督者（オーケストレーター）は分解・委譲・整合性検証を行い、モジュール内の実装コードを自分で書かない。例外として統合作業は監督者が直接行う。統合作業とは (a) `settings.gradle.kts` の include 追加・削除と `composeApp/app/build.gradle.kts` の依存追加・削除、(b) `app` の Koin バインドと `AppNavHost` の Route の登録・削除、(c) `gradle/libs.versions.toml` の変更、(d) ユーザー承認後の削除実行（`git rm`）を指す。
 2. 実装は対象モジュールごとに実装エージェントへ委譲する。実装エージェントには**必ず対象モジュールの `AGENTS.md` を最初に読ませる**。
 3. 依存関係のないモジュール作業は並列に実行する。
 4. モデル階層は下表のとおり。
 5. 実装エージェントは自モジュール外を編集せず、必要な他モジュールの変更を「他モジュールとの接点」として監督者へ報告する。
-6. 監督者は報告された接点の反映・Koin/Route/Gradle 依存の整合確認・テスト実行を行って完了とする。
+6. 監督者は報告された接点をルール1の統合作業として反映し、テスト実行を行って完了とする。
 
 | 役割 | 責務 | Claude | OpenAI |
 |---|---|---|---|
@@ -66,7 +66,7 @@ docs/                design-guide / coding-guide / decisions（読み物）
 | 既存画面を修正する | なし | [coding-guide.md](docs/coding-guide.md) §4、[design-guide.md](docs/design-guide.md) §5 | `feature/<name>`, `ui` |
 | テストを追加する | なし | [coding-guide.md](docs/coding-guide.md) §5 | 対象モジュール |
 | エラー処理を追加する | なし | [design-guide.md](docs/design-guide.md) §6 | 発生源の `data/<name>` または `domain/<name>`、`ui`（ハンドラ）、`feature/<name>`（ViewModel の `.handle()`） |
-| 依存ライブラリを更新する | なし | [decisions.md](docs/decisions.md) D-07 | 変更対象モジュール |
+| 依存ライブラリを更新する | なし | [decisions.md](docs/decisions.md) D-07 | `gradle/libs.versions.toml`（監督者が直接編集）。影響モジュールで build/test を確認 |
 | サンプルコードを削除する | [remove-sample-code](.claude/skills/remove-sample-code/SKILL.md) | — | SKILL.md 参照（実質全モジュール） |
 | 動作確認する | `.claude/skills/debug-run`（`debug-run-android`/`debug-run-ios`） | — | `app` |
 | UI 変更の PR を出す | [capture-screenshots](.claude/skills/capture-screenshots/SKILL.md) | [coding-guide.md](docs/coding-guide.md) §6 | `feature/<name>`, `ui` |
@@ -80,6 +80,7 @@ docs/                design-guide / coding-guide / decisions（読み物）
 - 依存関係のある連続した変更（契約 → 実装 → 画面 など）は 1 つの PR にまとめず、GitHub の Stacked PR として分割する。後続 PR は先行 PR の head ブランチを base にして起票し（`gh pr create --base <先行ブランチ>`）、本文冒頭に stack の順序（例: `Stack 2/3: #12 → #13 → #14`）を書く。先行 PR のマージ後は後続 PR の base が `main` になっていることを確認する（→ [docs/coding-guide.md](docs/coding-guide.md) §6）。
 - PR 本文は `## Summary` / `## Verification` / `## Intentionally left as-is` の構成にする。
 - UI を変更した PR は、修正箇所ごとに before / after のスクリーンショットを表形式（修正箇所 | Before | After）で `## Verification` に添付する。取得と添付の手順は [capture-screenshots](.claude/skills/capture-screenshots/SKILL.md)。
+- PR 本文の構成・Stacked PR の `Stack n/N` 表記・UI 変更時のスクリーンショット表・Conventional Commits 形式は CI（`.github/workflows/pr-checks.yml`）が検証する。PR 本文の雛形は `.github/PULL_REQUEST_TEMPLATE.md`。
 - 削除は `git rm`/`rm` の前に対象一覧を提示し、明示的な確認を得てから実行する。
 - 規約を変更する場合は、同じ PR で該当する docs（[docs/design-guide.md](docs/design-guide.md)、[docs/coding-guide.md](docs/coding-guide.md)、[docs/decisions.md](docs/decisions.md)）とモジュール `AGENTS.md` を更新する。
 - ルートおよびモジュールの `AGENTS.md` にはサンプル固有のリソース名（画面名・API 名・クラス名）を書かず、`data/<source>` / `feature/<name>` / `Xxx…` のプレースホルダで書く。具体名はディレクトリと `build.gradle.kts` を見る。

@@ -23,7 +23,6 @@ import org.starter.project.ui.shared.component.article.ArticlesPagingSource
 import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
-import org.starter.project.ui.shared.state.SnackBarState
 
 class UserScreenViewModel(
     private val zennService: ZennService
@@ -110,10 +109,5 @@ class UserScreenViewModel(
 
     fun onSnackBarShown() {
         _screenState.update { it.copy(snackBarState = null) }
-    }
-
-    @VisibleForTesting
-    internal fun updateSnackBarState(message: String) {
-        _screenState.update { it.copy(snackBarState = SnackBarState(message)) }
     }
 }

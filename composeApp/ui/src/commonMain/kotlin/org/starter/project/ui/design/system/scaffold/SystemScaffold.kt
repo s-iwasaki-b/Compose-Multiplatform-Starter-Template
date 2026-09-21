@@ -51,8 +51,6 @@ fun SystemScaffold(
         snackbarHostState.showSnackbar(
             message = message, duration = SnackbarDuration.Short
         )
-        // 表示完了後に呼ぶこと。showSnackbar前に呼ぶと状態がnullになりこのLaunchedEffectが
-        // 再起動され、表示中のSnackBarが即座に消えてしまう。
         onSnackBarShown()
     }
 

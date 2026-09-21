@@ -106,4 +106,8 @@ class UserScreenViewModel(
             nextPage = key
         ).handle(ErrorScreenThrowableHandler(_screenState))
     }
+
+    fun onSnackBarShown() {
+        _screenState.update { it.copy(snackBarState = null) }
+    }
 }

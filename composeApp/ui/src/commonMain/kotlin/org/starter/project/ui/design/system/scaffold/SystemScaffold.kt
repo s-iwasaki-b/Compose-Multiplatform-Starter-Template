@@ -38,6 +38,7 @@ fun SystemScaffold(
     screenState: ScreenState,
     backgroundColor: Color = SystemTheme.colors.background,
     onClickErrorActionButton: (() -> Unit)? = null,
+    onSnackBarShown: () -> Unit = {},
     topBar: @Composable (() -> Unit)? = null,
     bottomBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
@@ -50,6 +51,7 @@ fun SystemScaffold(
         snackbarHostState.showSnackbar(
             message = message, duration = SnackbarDuration.Short
         )
+        onSnackBarShown()
     }
 
     Scaffold(

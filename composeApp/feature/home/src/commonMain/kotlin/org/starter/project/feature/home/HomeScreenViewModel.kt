@@ -110,4 +110,8 @@ class HomeScreenViewModel(
             )
         }
     }
+
+    fun onSnackBarShown() {
+        _screenState.update { it.copy(snackBarState = null) }
+    }
 }

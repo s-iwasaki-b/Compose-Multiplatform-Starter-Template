@@ -1,5 +1,6 @@
 plugins {
     id("kmp-compose-library")
+    alias(libs.plugins.mokkery)
 }
 
 kotlin {
@@ -14,6 +15,9 @@ kotlin {
             api(projects.composeApp.ui)
             implementation(projects.composeApp.domain.service)
             implementation(libs.compose.components.resources)
+        }
+        commonTest.dependencies {
+            implementation(libs.bundles.test)
         }
     }
 }

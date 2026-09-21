@@ -1,7 +1,5 @@
 package org.starter.project.feature.home
 
-import androidx.paging.compose.LazyPagingItems
-import org.starter.project.base.data.model.zenn.Article
 import org.starter.project.ui.route.AppRoute
 import org.starter.project.ui.route.AppRouter
 import org.starter.project.ui.shared.event.ScreenEvent
@@ -14,6 +12,7 @@ internal sealed interface HomeScreenEvent : ScreenEvent {
     data class OnClickUser(val username: String) : HomeScreenEvent
     data object OnPullToRefresh : HomeScreenEvent
     data object OnPullToRefreshComplete : HomeScreenEvent
+    data object OnSnackBarShown : HomeScreenEvent
 }
 
 internal object HomeScreenEventHandler {
@@ -21,11 +20,11 @@ internal object HomeScreenEventHandler {
         event: ScreenEvent,
         appRouter: AppRouter,
         viewModel: HomeScreenViewModel,
-        articlesPagingItems: LazyPagingItems<Article>
+        onRefreshArticles: () -> Unit
     ) {
         when (event) {
             HomeScreenEvent.OnClickErrorScreenAction -> {
-                articlesPagingItems.refresh()
+                onRefreshArticles()
             }
 
             is HomeScreenEvent.OnChangeSearchKeyword -> {
@@ -34,11 +33,11 @@ internal object HomeScreenEventHandler {
 
             HomeScreenEvent.OnClickClearSearchKeyword -> {
                 viewModel.updateSearchKeyword("")
-                articlesPagingItems.refresh()
+                onRefreshArticles()
             }
 
             HomeScreenEvent.OnClickActionSearchKeyword -> {
-                articlesPagingItems.refresh()
+                onRefreshArticles()
             }
 
             is HomeScreenEvent.OnClickUser -> {
@@ -47,11 +46,15 @@ internal object HomeScreenEventHandler {
 
             HomeScreenEvent.OnPullToRefresh -> {
                 viewModel.updatePullToRefreshing(true)
-                articlesPagingItems.refresh()
+                onRefreshArticles()
             }
 
             HomeScreenEvent.OnPullToRefreshComplete -> {
                 viewModel.updatePullToRefreshing(false)
+            }
+
+            HomeScreenEvent.OnSnackBarShown -> {
+                viewModel.onSnackBarShown()
             }
 
             else -> {

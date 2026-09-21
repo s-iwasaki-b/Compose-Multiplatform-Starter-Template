@@ -13,7 +13,6 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -42,7 +42,7 @@ fun HomeScreen(
     appRouter: AppRouter,
     navArgs: AppRoute.Home.NavArgs
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
 
     // This is an example of lifecycle event listener
@@ -69,7 +69,7 @@ fun HomeScreen(
             event = event,
             appRouter = appRouter,
             viewModel = viewModel,
-            articlesPagingItems = articlesPagingItems
+            onRefreshArticles = articlesPagingItems::refresh
         )
     }
 }
@@ -106,6 +106,9 @@ private fun HomeScreenContent(
         screenState = state.screenState,
         onClickErrorActionButton = {
             dispatch(HomeScreenEvent.OnClickErrorScreenAction)
+        },
+        onSnackBarShown = {
+            dispatch(HomeScreenEvent.OnSnackBarShown)
         }
     ) { paddingValues ->
         Box(

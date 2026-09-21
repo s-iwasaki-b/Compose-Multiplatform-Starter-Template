@@ -13,11 +13,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import org.starter.project.base.data.model.zenn.Article
@@ -35,7 +35,7 @@ fun UserScreen(
     appRouter: AppRouter,
     navArgs: AppRoute.User.NavArgs
 ) {
-    val state by viewModel.state.collectAsState()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val articlesPagingItems = viewModel.articlesPagingFlow.collectAsLazyPagingItems()
 
     LaunchedEffect(navArgs.username) {
@@ -49,7 +49,8 @@ fun UserScreen(
         UserScreenEventHandler(
             event = event,
             appRouter = appRouter,
-            articlesPagingItems = articlesPagingItems
+            viewModel = viewModel,
+            onRefreshArticles = articlesPagingItems::refresh
         )
     }
 }
@@ -65,6 +66,9 @@ private fun UserScreenContent(
         screenState = state.screenState,
         onClickErrorActionButton = {
             dispatch(UserScreenEvent.OnClickErrorScreenAction)
+        },
+        onSnackBarShown = {
+            dispatch(UserScreenEvent.OnSnackBarShown)
         },
         topBar = {
             TopAppBar(

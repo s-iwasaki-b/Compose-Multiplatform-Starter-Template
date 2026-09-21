@@ -38,6 +38,7 @@ fun SystemScaffold(
     screenState: ScreenState,
     backgroundColor: Color = SystemTheme.colors.background,
     onClickErrorActionButton: (() -> Unit)? = null,
+    onSnackBarShown: () -> Unit = {},
     topBar: @Composable (() -> Unit)? = null,
     bottomBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
@@ -50,6 +51,9 @@ fun SystemScaffold(
         snackbarHostState.showSnackbar(
             message = message, duration = SnackbarDuration.Short
         )
+        // 表示完了後に呼ぶこと。showSnackbar前に呼ぶと状態がnullになりこのLaunchedEffectが
+        // 再起動され、表示中のSnackBarが即座に消えてしまう。
+        onSnackBarShown()
     }
 
     Scaffold(

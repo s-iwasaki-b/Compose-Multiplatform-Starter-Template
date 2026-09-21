@@ -25,6 +25,7 @@ import org.starter.project.ui.shared.handler.ErrorScreenThrowableHandler
 import org.starter.project.ui.shared.handler.IgnoreThrowableHandler
 import org.starter.project.ui.shared.state.ScreenLoadingState
 import org.starter.project.ui.shared.state.ScreenState
+import org.starter.project.ui.shared.state.SnackBarState
 import kotlin.time.Duration.Companion.milliseconds
 
 class HomeScreenViewModel(
@@ -109,5 +110,14 @@ class HomeScreenViewModel(
                 searchKeyword = keyword
             )
         }
+    }
+
+    fun onSnackBarShown() {
+        _screenState.update { it.copy(snackBarState = null) }
+    }
+
+    @VisibleForTesting
+    internal fun updateSnackBarState(message: String) {
+        _screenState.update { it.copy(snackBarState = SnackBarState(message)) }
     }
 }

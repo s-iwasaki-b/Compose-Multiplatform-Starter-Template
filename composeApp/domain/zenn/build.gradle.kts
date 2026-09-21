@@ -1,6 +1,5 @@
 plugins {
     id("kmp-library")
-    alias(libs.plugins.mokkery)
 }
 
 kotlin {
@@ -14,6 +13,7 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.bundles.test)
+            implementation(projects.composeApp.testing)
         }
     }
 }

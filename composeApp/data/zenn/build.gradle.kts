@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.serialization)
     alias(libs.plugins.google.devtools.ksp)
     alias(libs.plugins.ktorfit)
-    alias(libs.plugins.mokkery)
 }
 
 kotlin {

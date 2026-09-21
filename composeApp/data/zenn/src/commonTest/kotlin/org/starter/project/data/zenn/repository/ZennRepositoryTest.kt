@@ -1,34 +1,46 @@
 package org.starter.project.data.zenn.repository
 
-import dev.mokkery.MockMode
-import dev.mokkery.answering.returns
-import dev.mokkery.every
-import dev.mokkery.everySuspend
-import dev.mokkery.matcher.any
-import dev.mokkery.mock
-import dev.mokkery.verify
-import dev.mokkery.verify.VerifyMode
 import kotlinx.coroutines.test.runTest
 import org.starter.project.data.zenn.converter.ArticlesConverter
-import org.starter.project.data.zenn.datasource.api.ZennApi
+import org.starter.project.data.zenn.datasource.api.FakeZennApi
+import org.starter.project.data.zenn.datasource.api.response.ArticleResponse
+import org.starter.project.data.zenn.datasource.api.response.ArticleUserResponse
 import org.starter.project.data.zenn.datasource.api.response.ArticlesResponse
-import org.starter.project.data.zenn.datasource.preferences.ZennPreferences
+import org.starter.project.data.zenn.datasource.preferences.FakeZennPreferences
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class ZennRepositoryTest {
-    private val mockZennApi = mock<ZennApi>()
-    private val mockZennPreferences = mock<ZennPreferences>(MockMode.autofill)
-    private val subject = ZennRepositoryImpl(mockZennApi, mockZennPreferences)
+    private val fakeZennApi = FakeZennApi()
+    private val zennPreferences = FakeZennPreferences()
+    private val subject = ZennRepositoryImpl(fakeZennApi, zennPreferences)
 
     @Test
     fun fetchArticles() = runTest {
         // arrange
-        val response = ArticlesResponse(emptyList(), "next_page")
-        everySuspend { mockZennApi.fetchArticles(any(), any(), any(), any()) } returns response
+        val userResponse = ArticleUserResponse(
+            id = 0,
+            username = "username",
+            name = "name",
+            avatarSmallUrl = "avatar_small_url"
+        )
+        val articleResponse = ArticleResponse(
+            id = 0,
+            emoji = "emoji",
+            title = "title",
+            commentsCount = 1,
+            likedCount = 2,
+            publishedAt = "published_at",
+            user = userResponse
+        )
+        val response = ArticlesResponse(
+            articles = listOf(articleResponse),
+            nextPage = "next_page"
+        )
+        fakeZennApi.articlesByPublicationName["publication"] = response
 
         // act
-        val actual = subject.fetchArticles("", "", "", "")
+        val actual = subject.fetchArticles(publicationName = "publication")
 
         // assert
         val expected = ArticlesConverter(response)
@@ -38,8 +50,7 @@ class ZennRepositoryTest {
     @Test
     fun getLastKeyword() {
         // arrange
-        val keyword = "keyword"
-        every { mockZennPreferences.lastKeyword } returns keyword
+        zennPreferences.lastKeyword = "keyword"
 
         // act
         val actual = subject.getLastKeyword()
@@ -58,6 +69,7 @@ class ZennRepositoryTest {
         subject.updateLastKeyword(keyword)
 
         // assert
-        verify(VerifyMode.exactly(1)) { mockZennPreferences.lastKeyword = keyword }
+        val expected = "keyword"
+        assertEquals(expected, zennPreferences.lastKeyword)
     }
 }

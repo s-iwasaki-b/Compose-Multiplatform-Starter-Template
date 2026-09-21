@@ -20,6 +20,8 @@ An Xcode installation is required to build the iOS app.
 
 Run the shared unit tests on the Android host with `./gradlew testAndroidHostTest` or the `AllTest` run configuration.
 
+This repository does not use a mocking library. Instead, it follows the [Android testing guide's recommendation](https://developer.android.com/training/testing/fundamentals/test-doubles) to use fakes: lightweight, in-memory implementations of an interface. Fakes for boundaries internal to a single module (e.g. `FakeZennApi`, `FakeZennPreferences`) live in that module's `commonTest`, while fakes shared across module tests (e.g. `FakeZennRepository`) live in the `composeApp:testing` module. Tests assert against return values and fake state rather than verifying calls.
+
 ### How to Rename
 Gradle task is available for renaming projects and packages.  
 Please follow the steps below to use it. 
@@ -71,7 +73,6 @@ Navigation uses [`org.jetbrains.androidx.navigation:navigation-compose`](https:/
 | [ktor](https://github.com/ktorio/ktor) | 3.6.0 | HTTP client |
 | [Ktorfit](https://github.com/Foso/Ktorfit) | 2.7.5 | REST API interface such as [Retrofit](https://github.com/square/retrofit) |
 | [coil](https://github.com/coil-kt/coil?tab=readme-ov-file#jetpack-compose) | 3.6.3 | Loading async image |
-| [Mokkery](https://github.com/lupuuss/Mokkery) | 3.5.0 | Mocking such as [MockK](https://github.com/mockk/mockk?tab=readme-ov-file) |
 | [Napier](https://github.com/AAkira/Napier) | 2.7.1 | Logging, it is implemented to output only in debug build in this repository |
 
 
